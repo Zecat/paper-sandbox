@@ -1,0 +1,153 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../hydrolysis/hydrolysis-analyzer.html">
+
+<!--
+`auto-demo-snippet`
+
+
+@demo demo/index.html
+-->
+
+<dom-module id="auto-demo-snippet">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+      #bindedProps {
+        @apply --layout-horizontal;
+      }
+    </style>
+    <hydrolysis-analyzer id="analyzer"  clean analyzer="{{_hydroDesc}}" loading="{{_hydroLoading}}"></hydrolysis-analyzer>
+    <div id="element">
+      <slot></slot>
+    </div>
+    <div id="bindedProps">
+      <div>
+        <template is="dom-repeat" items="{{elementProperties.Function}}">
+          <paper-button>[[item.name]]</paper-button>
+          <p>[[item.desc]]</p>
+        </template>
+      </div>
+      <div>
+        <template is="dom-repeat" items="{{elementProperties.Boolean}}">
+          <paper-item>
+            <paper-toggle-button checked="{{item.value}}">[[item.name]]</paper-toggle-button>
+          <!-- [[item.desc]] -->
+          <paper-item>
+        </template>
+      </div>
+      <div>
+        <template is="dom-repeat" items="{{elementProperties.String}}">
+          <paper-input label="[[item.name]]" value="{{item.value}}"></paper-input>
+          [[item.desc]]
+        </template>
+      </div>
+  </div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'auto-demo-snippet',
+
+      properties: {
+        importPath: {
+          type: String
+        },
+        element: {
+          type: Object
+        },
+        _hydroDesc: {
+          type: Object,
+          value: () => ({})
+        },
+        prop1: {
+          type: String,
+          value: 'auto-demo-snippet',
+        },
+        booleanProps: {
+          type: Array,
+          value: () => []
+        },
+        stringProps: {
+          type: Array,
+          value: () => []
+        },
+        elementProperties: {
+          type: Object,
+          value: () => ({
+            'Boolean': [],
+            'String': [],
+            'Function': [],
+            'Object': [],
+            'Number': []
+          })
+        }
+      },
+
+      observers: [
+        '_elementPropertiesChanged(elementProperties.*)',
+        '_booleanPropsChanged(booleanProps.*)',
+        '_stringPropsChanged(stringProps.*)',
+        '_hydroDescChanged(_hydroDesc)'
+      ],
+
+      attached() {
+        this._observer = Polymer.dom(this).observeNodes(this._onNodesChange);
+      },
+
+      _onNodesChange: function(info) {
+        this.element = Polymer.dom(this).children[0];
+        this.$.analyzer.src = `${this.element.importPath}${this.element.is}.html`;
+        this.$.analyzer.analyze();
+      },
+
+      _elementPropertiesChanged(cr) {
+        var nameSubpath = cr.path.indexOf('.value');
+        if (nameSubpath >= 0) {
+          let type = cr.path.split('.')[1];
+          var itempath = cr.path.substring(0, nameSubpath);
+          var item = this.get(itempath);
+          var index = cr.base[type].indexOf(item);
+          // this.element[item.name] = item.value;
+          this.serializeValueToAttribute(item.value, item.name, this.element)
+        }
+      },
+
+      _hydroDescChanged(_hydroDesc) {console.log(_hydroDesc);
+        let ignoredFunctions = ['attached', 'registered', 'ready' ,'detached'];
+        if (!_hydroDesc.elementsByTagName) {
+          return;
+        }
+        let elementsDescriptor = _hydroDesc.elementsByTagName;
+        // console.log(elementsDescriptor);
+        // name = elementsDescriptor[this.element.is];
+
+        let elementDescriptor = elementsDescriptor[this.element.is];
+        // let element = document.createElement(name);
+        for (let property of elementDescriptor.properties) {
+          let name = property.name;
+          let firstChar = name[0];
+          let isPrivate = firstChar == '_';
+          let type = property.type;
+            // TODO: manage unknown type properties whe type == ''
+          if (!isPrivate && type && !(type === 'Function' && ignoredFunctions.includes(name))) {
+            this.push(`elementProperties.${property.type}`, {name, value: property.default, desc: property.desc});
+            let lastIndex = this.elementProperties[property.type].length - 1;
+            console.log(`element.${name}`);
+            this.linkPaths(`elementProperties.${property.type}.${lastIndex}.value`, `element.${name}`);
+          }
+        }
+        // Polymer.dom(this.$.elements).appendChild(element);
+        // this.element = element;
+      }
+
+    });
+  </script>
+</dom-module>
