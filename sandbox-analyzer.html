@@ -63,7 +63,6 @@
         }
         let elementsDescriptor = _hydroDesc.elementsByTagName;
         let elementDescriptor = elementsDescriptor[this.element.is];
-
         if(!elementDescriptor) {
           return;
         }
@@ -72,7 +71,9 @@
           'String': [],
           'Function': [],
           'Object': [],
-          'Number': []
+          'Number': [],
+          'Event': [],
+          'Fired': [],
         };
         for (let property of elementDescriptor.properties) {
           let name = property.name;
@@ -97,6 +98,9 @@
             // Maybe there's a way to user linkPaths method for that job ?
             // TODO: remove listener when needed
           }
+        }
+        for (let event of elementDescriptor.events) {
+          elementProperties.Event.push({name: event.name, desc: event.desc});
         }
         return elementProperties;
         // Polymer.dom(this.$.elements).appendChild(element);

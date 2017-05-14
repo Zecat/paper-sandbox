@@ -8,6 +8,7 @@
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../paper-styles/typography.html">
 <link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
 
 <!--
@@ -29,12 +30,16 @@
       .vertical {
         @apply --layout-vertical;
       }
+      .subheader {
+        @apply --paper-font-subhead;
+      }
     </style>
 
     <paper-toggle-button checked="{{showPrivate}}">Show private</paper-toggle-button>
     <!-- TODO: give the tooltips a better style using prism-hightlighter -->
     <div id="bindedProps">
       <div>
+        <div class="subheader">Functions</div>
         <template
           is="dom-repeat"
           items="{{elementProperties.Function}}"
@@ -63,6 +68,7 @@
         </template>
       </div>
       <div class="vertical">
+        <div class="subheader">Boolean properties</div>
         <template
           is="dom-repeat"
           items="{{elementProperties.Boolean}}"
@@ -75,6 +81,7 @@
         </template>
       </div>
       <div class="vertical">
+        <div class="subheader">String properties</div>
         <template
           is="dom-repeat"
           items="{{elementProperties.String}}"
@@ -87,6 +94,7 @@
         </template>
       </div>
       <div class="vertical">
+        <div class="subheader">Number properties</div>
         <template
           is="dom-repeat"
           items="{{elementProperties.Number}}"
@@ -96,6 +104,30 @@
           <paper-input label="[[item.name]]" value="{{item.value}}"></paper-input>
           <paper-tooltip>[[item.desc]]</paper-tooltip>
         </paper-item>
+        </template>
+      </div>
+      <div class="vertical">
+        <div class="subheader">Events</div>
+        <template
+          is="dom-repeat"
+          items="{{elementProperties.Event}}"
+        >
+          <paper-item>
+            [[item.name]]
+            <paper-tooltip>[[item.desc]]</paper-tooltip>
+          </paper-item>
+        </template>
+      </div>
+      <div class="vertical">
+        <div class="subheader">Events fired</div>
+        <template
+          is="dom-repeat"
+          items="{{elementProperties.Fired}}"
+        >
+          <paper-item>
+            [[item.name]]
+            <paper-tooltip>[[item.detail]]</paper-tooltip>
+          </paper-item>
         </template>
       </div>
   </div>

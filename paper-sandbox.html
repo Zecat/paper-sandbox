@@ -86,9 +86,15 @@
       _elementPropertiesChanged(elementProperties) {
         for (let type in elementProperties) {
           elementProperties[type].forEach((property, index) => {
-            this.element.addEventListener(`${property.name}-changed`, ev => {
-              this.set(`elementProperties.${type}.${index}.value`, ev.detail.value);
-            });
+            if (type == 'Event') {
+              this.element.addEventListener(property.name, ev => {
+                this.unshift(`elementProperties.Fired`, {name: property.name, detail: JSON.stringify(ev.detail)});
+              });
+            } else {
+              this.element.addEventListener(`${property.name}-changed`, ev => {
+                this.set(`elementProperties.${type}.${index}.value`, ev.detail.value);
+              });
+            }
           });
         }
       },
@@ -97,7 +103,7 @@
         this._observer = Polymer.dom(this).observeNodes(this._onNodesChange);
       },
 
-      _onNodesChange: function(info) {console.log(Polymer.dom(this).children)
+      _onNodesChange: function(info) {
         this.element = Polymer.dom(this).children[0];
       },
 
