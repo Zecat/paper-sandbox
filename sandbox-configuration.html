@@ -130,6 +130,19 @@
           </paper-item>
         </template>
       </div>
+      <div class="vertical" hidden$="[[!configuration.Promise]]">
+        <div class="subheader">Promise properties</div>
+        <template
+          is="dom-repeat"
+          items="{{configuration.Promise}}"
+          filter="[[filterFn]]"
+        >
+          <paper-item>
+            [[item.name]]
+            <paper-tooltip>[[item.desc]]</paper-tooltip>
+          </paper-item>
+        </template>
+      </div>
   </div>
   </template>
 
