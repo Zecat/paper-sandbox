@@ -72,7 +72,6 @@
         }
       },
 
-
       _updateElementAttribute(cr, element) {
         var nameSubpath = cr.path.indexOf('.value');
         if (nameSubpath >= 0) {
@@ -80,7 +79,7 @@
           var itempath = cr.path.substring(0, nameSubpath);
           var item = this.get(itempath);
           var index = cr.base[type].indexOf(item);
-          this.serializeValueToAttribute(item.value, item.name, element);
+          element[item.name] = item.value;
         }
       },
 
