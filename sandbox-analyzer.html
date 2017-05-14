@@ -2,13 +2,13 @@
 <link rel="import" href="../hydrolysis/hydrolysis-analyzer.html">
 
 <!--
-`element-sandboxer`
+`sandbox-analyzer`
 
 
 @demo demo/index.html
 -->
 
-<dom-module id="element-sandboxer">
+<dom-module id="sandbox-analyzer">
   <template>
     <hydrolysis-analyzer id="analyzer" clean analyzer="{{_hydroDesc}}" loading="{{loading}}"></hydrolysis-analyzer>
   </template>
@@ -16,7 +16,7 @@
   <script>
     Polymer({
 
-      is: 'element-sandboxer',
+      is: 'sandbox-analyzer',
 
       properties: {
         loading: {
@@ -62,6 +62,10 @@
         // name = elementsDescriptor[this.element.is];
 
         let elementDescriptor = elementsDescriptor[element.is];
+
+        if(!elementDescriptor) {
+          return;
+        }
         // let element = document.createElement(name);
         let elementProperties = {
           'Boolean': [],

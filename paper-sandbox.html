@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="element-sandboxer.html">
-<link rel="import" href="paper-properties-configuration.html">
+<link rel="import" href="sandbox-analyzer.html">
+<link rel="import" href="sandbox-configuration.html">
 
 <!--
 `paper-sandbox`
@@ -17,17 +17,15 @@
       }
     </style>
 
-    <element-sandboxer element-properties="{{elementProperties}}" element="[[element]]"></element-sandboxer>
+    <sandbox-analyzer element-properties="{{elementProperties}}" element="[[element]]"></sandbox-analyzer>
 
-    <div id="elementWrapper">
-      <slot></slot>
-    </div>
+    <slot></slot>
 
-    <paper-properties-configuration
+    <sandbox-configuration
       element="[[element]]"
       element-properties="{{elementProperties}}"
       show-private="{{showPrivate}}"
-    ></paper-properties-configuration>
+    ></sandbox-configuration>
 
   </template>
 
@@ -55,7 +53,6 @@
 
       observers: [
         '_updateElementAttribute(elementProperties.*, element)',
-        '_elementChanged(element)',
         '_elementPropertiesChanged(elementProperties)'
       ],
 
@@ -70,9 +67,9 @@
         }
       },
 
-      _elementPropertiesChanged(newValue, oldValue) {
-        for (let type in newValue) {
-          newValue[type].forEach((property, index) => {
+      _elementPropertiesChanged(elementProperties) {
+        for (let type in elementProperties) {
+          elementProperties[type].forEach((property, index) => {
             this.element.addEventListener(`${property.name}-changed`, ev => {
               this.set(`elementProperties.${type}.${index}.value`, ev.detail.value);
             });
@@ -84,7 +81,7 @@
         this._observer = Polymer.dom(this).observeNodes(this._onNodesChange);
       },
 
-      _onNodesChange: function(info) {
+      _onNodesChange: function(info) {console.log(Polymer.dom(this).children)
         this.element = Polymer.dom(this).children[0];
       },
 

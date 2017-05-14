@@ -23,9 +23,21 @@
       <!-- <h3>Basic paper-sandbox demo</h3> -->
       <!-- <demo-snippet> -->
         <!-- <template> -->
-          <paper-sandbox>
-            <paper-input label="label" placeholder="placeholder"></paper-input>
+          <paper-sandbox id="sandbox">
+            <!-- <paper-input label="label" placeholder="placeholder"></paper-input> -->
           </paper-sandbox>
+          <script>
+            document.addEventListener('WebComponentsReady', () => {
+              let sandbox = Polymer.dom(document.getElementById('sandbox'));
+              let paperInput = document.createElement('paper-input');
+              sandbox.appendChild(paperInput);
+              setTimeout(() => {
+                sandbox.removeChild(paperInput);
+                let paperSpinner = document.createElement('paper-spinner');
+                sandbox.appendChild(paperSpinner);
+              }, 5000)
+            });
+          </script>
         <!-- </template> -->
       <!-- </demo-snippet> -->
     <!-- </div> -->
