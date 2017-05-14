@@ -59,7 +59,7 @@
           </span>
           <!-- TODO: Use a dropdown to display the response -->
           <paper-icon-button on-tap="_handleFunctionButtonTap" icon="send"></paper-icon-button>[[item.lastResponse]]
-          <paper-item>
+        </paper-item>
         </template>
       </div>
       <div class="vertical">
@@ -71,7 +71,6 @@
           <paper-item>
             <paper-checkbox checked="{{item.value}}">[[item.name]]</paper-checkbox>
             <paper-tooltip>[[item.desc]]</paper-tooltip>
-            <!-- [[item.desc]] -->
           </paper-item>
         </template>
       </div>
@@ -85,7 +84,18 @@
           <paper-input label="[[item.name]]" value="{{item.value}}"></paper-input>
           <paper-tooltip>[[item.desc]]</paper-tooltip>
         </paper-item>
-          <!-- [[item.desc]] -->
+        </template>
+      </div>
+      <div class="vertical">
+        <template
+          is="dom-repeat"
+          items="{{elementProperties.Number}}"
+          filter="[[filterFn]]"
+        >
+          <paper-item>
+          <paper-input label="[[item.name]]" value="{{item.value}}"></paper-input>
+          <paper-tooltip>[[item.desc]]</paper-tooltip>
+        </paper-item>
         </template>
       </div>
   </div>
