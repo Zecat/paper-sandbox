@@ -17,7 +17,11 @@
       }
     </style>
 
-    <sandbox-analyzer element-properties="{{elementProperties}}" element="[[element]]"></sandbox-analyzer>
+    <sandbox-analyzer
+      element-properties="{{elementProperties}}"
+      element-href="[[elementHref]]"
+      element="[[element]]"
+    ></sandbox-analyzer>
 
     <slot></slot>
 
@@ -48,13 +52,26 @@
         ignoredFunctions: {
           type: Array,
           value: () => ['attached', 'registered', 'ready' ,'detached']
-        }
+        },
+        elementHref: {
+          type: String,
+          notify: true,
+          value: ''
+        },
       },
 
       observers: [
         '_updateElementAttribute(elementProperties.*, element)',
-        '_elementPropertiesChanged(elementProperties)'
+        '_elementPropertiesChanged(elementProperties)',
+        '_updateHref(element, elementHref)',
       ],
+
+      _updateHref(element, elementHref) {
+        if (!elementHref && element) {
+          this.elementHref = `${element.importPath}${element.is}.html`;
+        }
+      },
+
 
       _updateElementAttribute(cr, element) {
         var nameSubpath = cr.path.indexOf('.value');

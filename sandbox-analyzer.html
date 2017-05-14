@@ -36,37 +36,37 @@
         },
         elementProperties: {
           type: Object,
-          computed: '_computeElementProperties(_hydroDesc, ignoredFunctions, element)',
+          computed: '_computeElementProperties(_hydroDesc, ignoredFunctions)',
           notify: true
         },
         ignoredFunctions: {
           type: Array,
           value: () => ['attached', 'registered', 'ready' ,'detached']
+        },
+        elmentHref: {
+          type: String,
         }
       },
 
       observers: [
-        '_elementChanged(element)',
+        '_elementHrefChanged(elementHref)',
       ],
 
-      _elementChanged(element) {
-        this.$.analyzer.src = `${this.element.importPath}${this.element.is}.html`;
+      _elementHrefChanged(elementHref) {
+        this.$.analyzer.src = elementHref;
         this.$.analyzer.analyze();
       },
 
-      _computeElementProperties(_hydroDesc, ignoredFunctions, element) {
+      _computeElementProperties(_hydroDesc, ignoredFunctions) {
         if (!_hydroDesc.elementsByTagName) {
           return;
         }
         let elementsDescriptor = _hydroDesc.elementsByTagName;
-        // name = elementsDescriptor[this.element.is];
-
-        let elementDescriptor = elementsDescriptor[element.is];
+        let elementDescriptor = elementsDescriptor[this.element.is];
 
         if(!elementDescriptor) {
           return;
         }
-        // let element = document.createElement(name);
         let elementProperties = {
           'Boolean': [],
           'String': [],
@@ -84,7 +84,7 @@
           if (type && !(type === 'Function' && ignoredFunctions.includes(name))) {
             let prop = {
               name,
-              value: element[name],
+              value: this.element ? this.element[name] : property.default[name],
               private: isPrivate,
               desc: property.desc,
             }
