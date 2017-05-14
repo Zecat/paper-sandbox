@@ -75,7 +75,7 @@
           filter="[[filterFn]]"
         >
           <paper-item>
-            <paper-checkbox checked="{{item.value}}">[[item.name]]</paper-checkbox>
+            <paper-checkbox checked="{{item.value}}">[[_toHyphen(item.name)]]</paper-checkbox>
             <paper-tooltip>[[item.desc]]</paper-tooltip>
           </paper-item>
         </template>
@@ -88,7 +88,7 @@
           filter="[[filterFn]]"
         >
           <paper-item>
-          <paper-input label="[[item.name]]" value="{{item.value}}"></paper-input>
+          <paper-input label="[[_toHyphen(item.name)]]" value="{{item.value}}"></paper-input>
           <paper-tooltip>[[item.desc]]</paper-tooltip>
         </paper-item>
         </template>
@@ -101,7 +101,7 @@
           filter="[[filterFn]]"
         >
           <paper-item>
-          <paper-input label="[[item.name]]" value="{{item.value}}"></paper-input>
+          <paper-input label="[[_toHyphen(item.name)]]" value="{{item.value}}"></paper-input>
           <paper-tooltip>[[item.desc]]</paper-tooltip>
         </paper-item>
         </template>
@@ -154,6 +154,10 @@
           type: Object,
           value: () => ({})
         },
+      },
+
+      _toHyphen(value) {
+        return value.replace( /([A-Z])/g, "-$1" ).toLowerCase();
       },
 
       _computeFilterFn(showPrivate) {
