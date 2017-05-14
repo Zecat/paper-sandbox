@@ -87,6 +87,9 @@
         for (let type in configuration) {
           configuration[type].forEach((property, index) => {
             if (type == 'Event') {
+              if (!configuration.Fired) {
+                this.set('configuration.Fired', []);
+              }
               this.element.addEventListener(property.name, ev => {
                 this.unshift(`configuration.Fired`, {name: property.name, detail: JSON.stringify(ev.detail)});
               });

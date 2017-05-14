@@ -66,16 +66,7 @@
         if(!elementDescriptor) {
           return;
         }
-        let configuration = {
-          'Boolean': [],
-          'Array': [],
-          'String': [],
-          'Function': [],
-          'Object': [],
-          'Number': [],
-          'Event': [],
-          'Fired': [],
-        };
+        let configuration = {};
         for (let property of elementDescriptor.properties) {
           let name = property.name;
           let firstChar = name[0];
@@ -94,11 +85,17 @@
               prop.params = property.params;
               prop.lastResponse = undefined;
             }
+            if (!configuration[type]) {
+              configuration[type] = [];
+            }
             let lastIndex = configuration[type].push(prop) - 1;
             // TODO: type Function should listen to event, unless there are defined as configuration
             // Maybe there's a way to user linkPaths method for that job ?
             // TODO: remove listener when needed
           }
+        }
+        if (elementDescriptor.events) {
+          configuration.Event = [];
         }
         for (let event of elementDescriptor.events) {
           configuration.Event.push({name: event.name, desc: event.desc});
