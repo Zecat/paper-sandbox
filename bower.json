@@ -1,6 +1,23 @@
 {
   "name": "paper-sandbox",
+  "description": "Creates a sandbox to play with your Polymer element",
+  "version": "0.0.1",
   "main": "paper-sandbox.html",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Zecat/paper-sandbox.git"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Zecat/paper-sandbox",
+  "authors": [
+    "Zecat"
+  ],
+  "keywords": [
+    "web-components",
+    "polymer",
+    "sandbox",
+    "demo"
+  ],
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0",
     "hydrolysis": "^1.24.1",
