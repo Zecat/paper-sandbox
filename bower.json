@@ -1,7 +1,7 @@
 {
   "name": "paper-sandbox",
   "description": "Creates a sandbox to play with your Polymer element",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "main": "paper-sandbox.html",
   "repository": {
     "type": "git",
