@@ -91,7 +91,8 @@
                 this.unshift(`configuration.Fired`, {name: property.name, detail: JSON.stringify(ev.detail)});
               });
             } else {
-              this.element.addEventListener(`${property.name}-changed`, ev => {
+              let attribute = property.name.replace( /([A-Z])/g, "-$1" ).toLowerCase();
+              this.element.addEventListener(`${attribute}-changed`, ev => {
                 this.set(`configuration.${type}.${index}.value`, ev.detail.value);
               });
             }
