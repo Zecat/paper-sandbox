@@ -34,9 +34,9 @@
           type: Object,
           value: () => ({})
         },
-        elementProperties: {
+        configuration: {
           type: Object,
-          computed: '_computeElementProperties(_hydroDesc, ignoredFunctions)',
+          computed: '_computeConfiguration(_hydroDesc, ignoredFunctions)',
           notify: true
         },
         ignoredFunctions: {
@@ -57,7 +57,7 @@
         this.$.analyzer.analyze();
       },
 
-      _computeElementProperties(_hydroDesc, ignoredFunctions) {
+      _computeConfiguration(_hydroDesc, ignoredFunctions) {
         if (!_hydroDesc.elementsByTagName) {
           return;
         }
@@ -66,7 +66,7 @@
         if(!elementDescriptor) {
           return;
         }
-        let elementProperties = {
+        let configuration = {
           'Boolean': [],
           'String': [],
           'Function': [],
@@ -93,16 +93,16 @@
               prop.params = property.params;
               prop.lastResponse = undefined;
             }
-            let lastIndex = elementProperties[type].push(prop) - 1;
-            // TODO: type Function should listen to event, unless there are defined as elementProperties
+            let lastIndex = configuration[type].push(prop) - 1;
+            // TODO: type Function should listen to event, unless there are defined as configuration
             // Maybe there's a way to user linkPaths method for that job ?
             // TODO: remove listener when needed
           }
         }
         for (let event of elementDescriptor.events) {
-          elementProperties.Event.push({name: event.name, desc: event.desc});
+          configuration.Event.push({name: event.name, desc: event.desc});
         }
-        return elementProperties;
+        return configuration;
         // Polymer.dom(this.$.elements).appendChild(element);
         // this.element = element;
       }

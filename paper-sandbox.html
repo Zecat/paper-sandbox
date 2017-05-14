@@ -18,7 +18,7 @@
     </style>
 
     <sandbox-analyzer
-      element-properties="{{elementProperties}}"
+      configuration="{{configuration}}"
       element-href="[[elementHref]]"
       element="[[element]]"
     ></sandbox-analyzer>
@@ -27,7 +27,7 @@
 
     <sandbox-configuration
       element="[[element]]"
-      element-properties="{{elementProperties}}"
+      configuration="{{configuration}}"
       show-private="{{showPrivate}}"
     ></sandbox-configuration>
 
@@ -46,7 +46,7 @@
         element: {
           type: Object
         },
-        elementProperties: {
+        configuration: {
           type: Object
         },
         ignoredFunctions: {
@@ -61,8 +61,8 @@
       },
 
       observers: [
-        '_updateElementAttribute(elementProperties.*, element)',
-        '_elementPropertiesChanged(elementProperties)',
+        '_updateElementAttribute(configuration.*, element)',
+        '_configurationChanged(configuration)',
         '_updateHref(element, elementHref)',
       ],
 
@@ -83,16 +83,16 @@
         }
       },
 
-      _elementPropertiesChanged(elementProperties) {
-        for (let type in elementProperties) {
-          elementProperties[type].forEach((property, index) => {
+      _configurationChanged(configuration) {
+        for (let type in configuration) {
+          configuration[type].forEach((property, index) => {
             if (type == 'Event') {
               this.element.addEventListener(property.name, ev => {
-                this.unshift(`elementProperties.Fired`, {name: property.name, detail: JSON.stringify(ev.detail)});
+                this.unshift(`configuration.Fired`, {name: property.name, detail: JSON.stringify(ev.detail)});
               });
             } else {
               this.element.addEventListener(`${property.name}-changed`, ev => {
-                this.set(`elementProperties.${type}.${index}.value`, ev.detail.value);
+                this.set(`configuration.${type}.${index}.value`, ev.detail.value);
               });
             }
           });
