@@ -9,7 +9,7 @@
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
-<link rel="import" href="../hydrolysis/hydrolysis-analyzer.html">
+<link rel="import" href="element-sandboxer.html">
 
 <!--
 `paper-sandbox`
@@ -31,7 +31,9 @@
         @apply --layout-vertical;
       }
     </style>
-    <hydrolysis-analyzer id="analyzer" clean analyzer="{{_hydroDesc}}" loading="{{_hydroLoading}}"></hydrolysis-analyzer>
+
+    <element-sandboxer element-properties="{{elementProperties}}" element="[[element]]"></element-sandboxer>
+
     <div id="element">
       <slot></slot>
     </div>
@@ -109,37 +111,18 @@
           type: Function,
           computed: '_computeFilterFn(showPrivate)'
         },
-        importPath: {
-          type: String
-        },
         element: {
           type: Object
         },
-        _hydroDesc: {
-          type: Object,
-          value: () => ({})
-        },
         elementProperties: {
           type: Object,
-          value: () => ({
-            'Boolean': [],
-            'String': [],
-            'Function': [],
-            'Object': [],
-            'Number': []
-          })
+          value: () => ({})
         },
         ignoredFunctions: {
           type: Array,
           value: () => ['attached', 'registered', 'ready' ,'detached']
         }
       },
-
-      observers: [
-        '_elementPropertiesChanged(elementProperties.*, element)',
-        '_hydroDescChanged(_hydroDesc)',
-        '_elementChanged(element)',
-      ],
 
       _computeFilterFn(showPrivate) {
         return item => showPrivate || !item.private;
@@ -157,69 +140,6 @@
       _onNodesChange: function(info) {
         this.element = Polymer.dom(this).children[0];
       },
-
-      _elementChanged(element) {
-        this.$.analyzer.src = `${this.element.importPath}${this.element.is}.html`;
-        this.$.analyzer.analyze();
-      },
-
-      _elementPropertiesChanged(cr, element) {
-        var nameSubpath = cr.path.indexOf('.value');
-        if (nameSubpath >= 0) {
-          let type = cr.path.split('.')[1];
-          var itempath = cr.path.substring(0, nameSubpath);
-          var item = this.get(itempath);
-          var index = cr.base[type].indexOf(item);
-          this.serializeValueToAttribute(item.value, item.name, element);
-        }
-      },
-
-      _hydroDescChanged(_hydroDesc) {
-        if (!_hydroDesc.elementsByTagName) {
-          return;
-        }
-        let elementsDescriptor = _hydroDesc.elementsByTagName;
-        // name = elementsDescriptor[this.element.is];
-
-        let elementDescriptor = elementsDescriptor[this.element.is];
-        // let element = document.createElement(name);
-        let elementProperties = {
-          'Boolean': [],
-          'String': [],
-          'Function': [],
-          'Object': [],
-          'Number': []
-        };
-        for (let property of elementDescriptor.properties) {
-          let name = property.name;
-          let firstChar = name[0];
-          let isPrivate = firstChar == '_';
-          let type = property.type;
-            // TODO: manage unknown type properties whe type == ''
-            // TODO: manage private properties
-          if (type && !(type === 'Function' && this.ignoredFunctions.includes(name))) {
-            let prop = {
-              name,
-              value: this.element[name],
-              private: isPrivate,
-              desc: property.desc,
-            }
-            if (type === 'Function') {
-              prop.params = property.params;
-              prop.lastResponse = undefined;
-            }
-            let lastIndex = elementProperties[type].push(prop) - 1;
-            // TODO: type Function should listen to event, unless there are defined as properties
-            // Maybe there's a way to user linkPaths method for that job ?
-            this.element.addEventListener(`${name}-changed`, ev => {
-              this.set(`elementProperties.${property.type}.${lastIndex}.value`, ev.detail.value);
-            });
-          }
-        }
-        this.elementProperties = elementProperties;
-        // Polymer.dom(this.$.elements).appendChild(element);
-        // this.element = element;
-      }
 
     });
   </script>

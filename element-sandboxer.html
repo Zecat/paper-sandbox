@@ -1,0 +1,127 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../hydrolysis/hydrolysis-analyzer.html">
+
+<!--
+`element-sandboxer`
+
+
+@demo demo/index.html
+-->
+
+<dom-module id="element-sandboxer">
+  <template>
+    <hydrolysis-analyzer id="analyzer" clean analyzer="{{_hydroDesc}}" loading="{{loading}}"></hydrolysis-analyzer>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'element-sandboxer',
+
+      properties: {
+        loading: {
+          type: Boolean,
+          value: false,
+          notify: true
+        },
+        importPath: {
+          type: String
+        },
+        element: {
+          type: Object
+        },
+        _hydroDesc: {
+          type: Object,
+          value: () => ({})
+        },
+        elementProperties: {
+          type: Object,
+          computed: '_computeElementProperties(_hydroDesc, ignoredFunctions, element)',
+          observer: '_elementPropertiesChanged',
+          notify: true
+        },
+        ignoredFunctions: {
+          type: Array,
+          value: () => ['attached', 'registered', 'ready' ,'detached']
+        }
+      },
+
+      observers: [
+        '_updateElementAttribute(elementProperties.*, element)',
+        '_elementChanged(element)',
+      ],
+
+      _elementChanged(element) {
+        this.$.analyzer.src = `${this.element.importPath}${this.element.is}.html`;
+        this.$.analyzer.analyze();
+      },
+
+      _elementPropertiesChanged(newValue, oldValue) {
+        for (let type in newValue) {
+          newValue[type].forEach((property, index) => {
+            this.element.addEventListener(`${property.name}-changed`, ev => {
+              this.set(`elementProperties.${type}.${index}.value`, ev.detail.value);
+            });
+          });
+        }
+      },
+
+      _updateElementAttribute(cr, element) {
+        var nameSubpath = cr.path.indexOf('.value');
+        if (nameSubpath >= 0) {
+          let type = cr.path.split('.')[1];
+          var itempath = cr.path.substring(0, nameSubpath);
+          var item = this.get(itempath);
+          var index = cr.base[type].indexOf(item);
+          this.serializeValueToAttribute(item.value, item.name, element);
+        }
+      },
+
+      _computeElementProperties(_hydroDesc, ignoredFunctions, element) {
+        if (!_hydroDesc.elementsByTagName) {
+          return;
+        }
+        let elementsDescriptor = _hydroDesc.elementsByTagName;
+        // name = elementsDescriptor[this.element.is];
+
+        let elementDescriptor = elementsDescriptor[element.is];
+        // let element = document.createElement(name);
+        let elementProperties = {
+          'Boolean': [],
+          'String': [],
+          'Function': [],
+          'Object': [],
+          'Number': []
+        };
+        for (let property of elementDescriptor.properties) {
+          let name = property.name;
+          let firstChar = name[0];
+          let isPrivate = firstChar == '_';
+          let type = property.type;
+            // TODO: manage unknown type == ''
+            // TODO: manage private property
+          if (type && !(type === 'Function' && ignoredFunctions.includes(name))) {
+            let prop = {
+              name,
+              value: element[name],
+              private: isPrivate,
+              desc: property.desc,
+            }
+            if (type === 'Function') {
+              prop.params = property.params;
+              prop.lastResponse = undefined;
+            }
+            let lastIndex = elementProperties[type].push(prop) - 1;
+            // TODO: type Function should listen to event, unless there are defined as elementProperties
+            // Maybe there's a way to user linkPaths method for that job ?
+            // TODO: remove listener when needed
+          }
+        }
+        return elementProperties;
+        // Polymer.dom(this.$.elements).appendChild(element);
+        // this.element = element;
+      }
+
+    });
+  </script>
+</dom-module>
