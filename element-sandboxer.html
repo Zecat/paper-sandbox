@@ -37,7 +37,6 @@
         elementProperties: {
           type: Object,
           computed: '_computeElementProperties(_hydroDesc, ignoredFunctions, element)',
-          observer: '_elementPropertiesChanged',
           notify: true
         },
         ignoredFunctions: {
@@ -47,34 +46,12 @@
       },
 
       observers: [
-        '_updateElementAttribute(elementProperties.*, element)',
         '_elementChanged(element)',
       ],
 
       _elementChanged(element) {
         this.$.analyzer.src = `${this.element.importPath}${this.element.is}.html`;
         this.$.analyzer.analyze();
-      },
-
-      _elementPropertiesChanged(newValue, oldValue) {
-        for (let type in newValue) {
-          newValue[type].forEach((property, index) => {
-            this.element.addEventListener(`${property.name}-changed`, ev => {
-              this.set(`elementProperties.${type}.${index}.value`, ev.detail.value);
-            });
-          });
-        }
-      },
-
-      _updateElementAttribute(cr, element) {
-        var nameSubpath = cr.path.indexOf('.value');
-        if (nameSubpath >= 0) {
-          let type = cr.path.split('.')[1];
-          var itempath = cr.path.substring(0, nameSubpath);
-          var item = this.get(itempath);
-          var index = cr.base[type].indexOf(item);
-          this.serializeValueToAttribute(item.value, item.name, element);
-        }
       },
 
       _computeElementProperties(_hydroDesc, ignoredFunctions, element) {

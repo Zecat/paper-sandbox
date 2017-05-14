@@ -1,15 +1,6 @@
 <link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="../paper-input/paper-input.html">
-<link rel="import" href="../paper-button/paper-button.html">
-<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
-<link rel="import" href="../paper-tooltip/paper-tooltip.html">
-<link rel="import" href="../paper-item/paper-item.html">
-<link rel="import" href="../paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../iron-icons/iron-icons.html">
-<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../paper-checkbox/paper-checkbox.html">
-<link rel="import" href="../paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="element-sandboxer.html">
+<link rel="import" href="paper-properties-configuration.html">
 
 <!--
 `paper-sandbox`
@@ -24,77 +15,20 @@
       :host {
         display: block;
       }
-      #bindedProps {
-        @apply --layout-horizontal;
-      }
-      .vertical {
-        @apply --layout-vertical;
-      }
     </style>
 
     <element-sandboxer element-properties="{{elementProperties}}" element="[[element]]"></element-sandboxer>
 
-    <div id="element">
+    <div id="elementWrapper">
       <slot></slot>
     </div>
-    <paper-toggle-button checked="{{showPrivate}}">Show private</paper-toggle-button>
-    <!-- TODO: give the tooltips a better style using prism-hightlighter -->
-    <div id="bindedProps">
-      <div>
-        <template
-          is="dom-repeat"
-          items="{{elementProperties.Function}}"
-          filter="[[filterFn]]"
-        >
-          <paper-item>
-          <span>[[item.name]]<paper-tooltip>[[item.desc]]</paper-tooltip></span>
-          <span>
-            (
-            <paper-icon-button icon="settings">
-            </paper-icon-button>
-            )
-            <paper-tooltip>
-              <template
-                is="dom-repeat"
-                items="[[item.params]]" as="param">
-                [[param.desc]]<br>
-                [[param.name]]<br>
-                [[param.type]]
-              </template>
-            </paper-tooltip>
-          </span>
-          <!-- TODO: Use a dropdown to display the response -->
-          <paper-icon-button on-tap="_handleFunctionButtonTap" icon="send"></paper-icon-button>[[item.lastResponse]]
-          <paper-item>
-        </template>
-      </div>
-      <div class="vertical">
-        <template
-          is="dom-repeat"
-          items="{{elementProperties.Boolean}}"
-          filter="[[filterFn]]"
-        >
-          <paper-item>
-            <paper-checkbox checked="{{item.value}}">[[item.name]]</paper-checkbox>
-            <paper-tooltip>[[item.desc]]</paper-tooltip>
-            <!-- [[item.desc]] -->
-          </paper-item>
-        </template>
-      </div>
-      <div class="vertical">
-        <template
-          is="dom-repeat"
-          items="{{elementProperties.String}}"
-          filter="[[filterFn]]"
-        >
-          <paper-item>
-          <paper-input label="[[item.name]]" value="{{item.value}}"></paper-input>
-          <paper-tooltip>[[item.desc]]</paper-tooltip>
-        </paper-item>
-          <!-- [[item.desc]] -->
-        </template>
-      </div>
-  </div>
+
+    <paper-properties-configuration
+      element="[[element]]"
+      element-properties="{{elementProperties}}"
+      show-private="{{showPrivate}}"
+    ></paper-properties-configuration>
+
   </template>
 
   <script>
@@ -107,16 +41,11 @@
           type: Boolean,
           value: false
         },
-        filterFn: {
-          type: Function,
-          computed: '_computeFilterFn(showPrivate)'
-        },
         element: {
           type: Object
         },
         elementProperties: {
-          type: Object,
-          value: () => ({})
+          type: Object
         },
         ignoredFunctions: {
           type: Array,
@@ -124,13 +53,31 @@
         }
       },
 
-      _computeFilterFn(showPrivate) {
-        return item => showPrivate || !item.private;
+      observers: [
+        '_updateElementAttribute(elementProperties.*, element)',
+        '_elementChanged(element)',
+        '_elementPropertiesChanged(elementProperties)'
+      ],
+
+      _updateElementAttribute(cr, element) {
+        var nameSubpath = cr.path.indexOf('.value');
+        if (nameSubpath >= 0) {
+          let type = cr.path.split('.')[1];
+          var itempath = cr.path.substring(0, nameSubpath);
+          var item = this.get(itempath);
+          var index = cr.base[type].indexOf(item);
+          this.serializeValueToAttribute(item.value, item.name, element);
+        }
       },
 
-      _handleFunctionButtonTap(e) {
-        let model = e.model;
-        model.set('item.lastResponse', this.element[model.item.name]());
+      _elementPropertiesChanged(newValue, oldValue) {
+        for (let type in newValue) {
+          newValue[type].forEach((property, index) => {
+            this.element.addEventListener(`${property.name}-changed`, ev => {
+              this.set(`elementProperties.${type}.${index}.value`, ev.detail.value);
+            });
+          });
+        }
       },
 
       attached() {
