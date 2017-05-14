@@ -1,4 +1,4 @@
-# \<auto-demo-snippet\>
+# \<paper-sandbox\>
 
 
 
