@@ -19,7 +19,7 @@
     <div id="demoContainer"></div>
 
     <sandbox-configuration
-        configuration="[[configuration]]"
+        configuration="{{configuration}}"
         element="[[analyzedElement]]"
     ></sandbox-configuration>
 
@@ -58,6 +58,12 @@
             notify: true
           },
         };
+      }
+
+      static get observers() {
+        return [
+          '_updateElementAttribute(configuration.properties.*, analyzedElement)'
+        ];
       }
 
       constructor() {
@@ -120,7 +126,7 @@
         
         this.analyzedElement = this.$.demoContainer.querySelector(this.tag);
         if (!this.analyzedElement) return;
-
+        
         try {
           this.descriptor = await this.fetchDescriptorForElement(this.analyzedElement);
         } 
@@ -145,11 +151,10 @@
       }
 
       set descriptor(descriptor) {
-        console.log(descriptor);
         let configuration = this.emptyConfiguration;
 
         for (let {type, name, description, privacy} of descriptor.properties) {
-          configuration.properties[type].push({name, description, privacy});
+          configuration.properties[type].push({name, description, privacy, value: undefined});
         }
         for (let {name, description, params, privacy} of descriptor.methods) {
           configuration.methods.push({name, description, params, privacy});
@@ -162,7 +167,7 @@
         this.configuration = configuration;
 
         descriptor.attributes.forEach(({type, name}, i) => {
-          this.analyzedElement.addEventListener(`${name}-changed`, e => {console.log(name);
+          this.analyzedElement.addEventListener(`${name}-changed`, e => {
             this.set(`configuration.attributes.${type}.${i}.value`, e.detail.value);
           });
         })
@@ -172,7 +177,7 @@
       _updateElementAttribute(cr, element) {
         var nameSubpath = cr.path.indexOf('.value');
         if (nameSubpath >= 0) {
-          let type = cr.path.split('.')[1];
+          let type = cr.path.split('.')[2];
           var itempath = cr.path.substring(0, nameSubpath);
           var item = this.get(itempath);
           var index = cr.base[type].indexOf(item);
