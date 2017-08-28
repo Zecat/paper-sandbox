@@ -1,13 +1,7 @@
-<link rel="import" href="../polymer/polymer.html">
-<link rel="import" href="sandbox-analyzer.html">
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../shadycss/apply-shim.html">
+<link rel="import" href="../polymer/lib/utils/templatize.html">
 <link rel="import" href="sandbox-configuration.html">
-
-<!--
-`paper-sandbox`
-
-
-@demo demo/static.html
--->
 
 <dom-module id="paper-sandbox">
   <template>
@@ -15,62 +9,165 @@
       :host {
         display: block;
       }
+      #demoContainer {
+        @apply --paper-sandbox-demo-container;
+      }
     </style>
 
-    <sandbox-analyzer
-      configuration="{{configuration}}"
-      element-href="[[elementHref]]"
-      element="[[element]]"
-    ></sandbox-analyzer>
+    <slot on-slotchange="_slotChangeHandler"></slot>
 
-    <slot></slot>
+    <div id="demoContainer"></div>
 
     <sandbox-configuration
-      element="[[element]]"
-      configuration="{{configuration}}"
-      show-private="{{showPrivate}}"
+        configuration="[[configuration]]"
+        element="[[analyzedElement]]"
     ></sandbox-configuration>
 
   </template>
 
+
   <script>
-    Polymer({
+    /**
+     * Missing Description
+     * 
+     * #appliesMixin 
+     * @customElement
+     * @polymer
+     * @demo demo
+     */
+    class PaperSandbox extends Polymer.Element {
 
-      is: 'paper-sandbox',
+      static get is() { return 'paper-sandbox'; }
 
-      properties: {
-        showPrivate: {
-          type: Boolean,
-          value: false
-        },
-        element: {
-          type: Object
-        },
-        configuration: {
-          type: Object
-        },
-        ignoredFunctions: {
-          type: Array,
-          value: () => ['attached', 'registered', 'ready' ,'detached']
-        },
-        elementHref: {
-          type: String,
-          notify: true,
-          value: ''
-        },
-      },
+      static get properties() {
+        return {
+          /**
+           * The tag name of the element you want to produce a sandbox for.
+           * @type {String}
+           */
+          tag: String,
+          configuration: Object,
+          analyzedElement: {
+            type: HTMLElement,
+            notify: true
+          },
+          fetchingAnalysis: {
+            type: Boolean,
+            value: false,
+            readOnly: true,
+            notify: true
+          },
+        };
+      }
 
-      observers: [
-        '_updateElementAttribute(configuration.*, element)',
-        '_configurationChanged(configuration)',
-        '_updateHref(element, elementHref)',
-      ],
+      constructor() {
+        super();
+      }
 
-      _updateHref(element, elementHref) {
-        if (!elementHref && element) {
-          this.elementHref = `${element.importPath}${element.is}.html`;
+      connectedCallback() {
+        super.connectedCallback();
+      }
+
+      disconnectedCallback() {
+        super.disconnectedCallback();
+      }
+
+      async fetchDescriptorForElement(el, analysisPath) {
+        if (!el) throw new Error('No element specified to retrieve analysis');
+        if (el.nodeType != Node.ELEMENT_NODE) throw new Error('Can not fetch analysis for a non element node');
+        
+        if (!analysisPath) {
+          analysisPath = `${el.importPath}analysis.json`;
         }
-      },
+
+        let fetchAnalysis;
+
+        try {
+          this._setFetchingAnalysis(true);
+          fetchAnalysis = await fetch(analysisPath);
+          this._setFetchingAnalysis(false);
+        } catch (err) {
+          this._setFetchingAnalysis(false);
+          throw new Error('Analysis fetch error');
+        }
+
+        if (!fetchAnalysis.ok) throw new Error('Analysis fetched a wrong status code');
+
+        const {elements} = await fetchAnalysis.json();
+        if (!elements || !(elements instanceof Array)) throw new Error('No elements array find in analysis file');
+
+        const tagName = el.nodeName.toLowerCase();
+        const configForEl = elements.find(elConfig => elConfig.tagname === tagName);
+
+        if (!configForEl) throw new Error('No analysis configuration for the given tag name');
+
+        return configForEl;
+      }
+
+      async _slotChangeHandler(e) {
+        // TODO: test
+        const assignedNodes = e.target.assignedNodes({flatten: true});
+        if (!assignedNodes) return;
+
+        // Find the first template 
+        const template = assignedNodes.find(n => n.nodeName === 'TEMPLATE');
+        if (!template) return;
+        
+        this.ctr = Polymer.Templatize.templatize(template, this);
+        this.stamped = new this.ctr({});
+
+        this.$.demoContainer.appendChild(this.stamped.root);
+        
+        this.analyzedElement = this.$.demoContainer.querySelector(this.tag);
+        if (!this.analyzedElement) return;
+
+        try {
+          this.descriptor = await this.fetchDescriptorForElement(this.analyzedElement);
+        } 
+        catch (err) {
+          // TODO: manage errors
+          console.warn(err)
+        }
+      }
+
+      get emptyConfiguration() {
+        return {
+          properties: {
+            boolean: [],
+            string: [],
+            number: [],
+            object: [],
+            function: []
+          },
+          events: [],
+          methods: []
+        };
+      }
+
+      set descriptor(descriptor) {
+        console.log(descriptor);
+        let configuration = this.emptyConfiguration;
+
+        for (let {type, name, description, privacy} of descriptor.properties) {
+          configuration.properties[type].push({name, description, privacy});
+        }
+        for (let {name, description, params, privacy} of descriptor.methods) {
+          configuration.methods.push({name, description, params, privacy});
+        }
+        for (let {name, description} of descriptor.events) {
+          configuration.events.push({name, description});
+        }
+        Object.assign(configuration, {styling: descriptor.styling, slots: descriptor.slots, tagname: descriptor.tagname});
+
+        this.configuration = configuration;
+
+        descriptor.attributes.forEach(({type, name}, i) => {
+          this.analyzedElement.addEventListener(`${name}-changed`, e => {console.log(name);
+            this.set(`configuration.attributes.${type}.${i}.value`, e.detail.value);
+          });
+        })
+        
+      }
 
       _updateElementAttribute(cr, element) {
         var nameSubpath = cr.path.indexOf('.value');
@@ -81,7 +178,7 @@
           var index = cr.base[type].indexOf(item);
           element[item.name] = item.value;
         }
-      },
+      }
 
       _configurationChanged(configuration) {
         for (let type in configuration) {
@@ -101,16 +198,11 @@
             }
           });
         }
-      },
+      }
 
-      attached() {
-        this._observer = Polymer.dom(this).observeNodes(this._onNodesChange);
-      },
+    }
 
-      _onNodesChange: function(info) {
-        this.element = Polymer.dom(this).children[0];
-      },
+    window.customElements.define(PaperSandbox.is, PaperSandbox);
 
-    });
   </script>
 </dom-module>
