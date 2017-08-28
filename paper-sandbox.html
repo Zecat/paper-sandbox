@@ -11,6 +11,9 @@
       }
       #demoContainer {
         @apply --paper-sandbox-demo-container;
+        @apply --layout-center;
+        max-width: 300px;
+        margin: 42px auto;
       }
     </style>
 
@@ -80,6 +83,8 @@
 
       async fetchDescriptorForElement(el, analysisPath) {
         if (!el) throw new Error('No element specified to retrieve analysis');
+        // TODO: The custom element check could be improved following this example:
+        // https://developers.google.com/web/fundamentals/architecture/building-components/shadowdom#findall
         if (el.nodeType != Node.ELEMENT_NODE) throw new Error('Can not fetch analysis for a non element node');
         
         if (!analysisPath) {
@@ -154,10 +159,20 @@
         let configuration = this.emptyConfiguration;
 
         for (let {type, name, description, privacy} of descriptor.properties) {
-          configuration.properties[type].push({name, description, privacy, value: undefined});
+          configuration.properties[type].push({
+            name,
+            description,
+            privacy,
+            value: undefined
+          });
         }
         for (let {name, description, params, privacy} of descriptor.methods) {
-          configuration.methods.push({name, description, params, privacy});
+          configuration.methods.push({
+            name,
+            description,
+            params: params.map(p => Object.assign(p, {value: undefined})),
+            privacy
+          });
         }
         for (let {name, description} of descriptor.events) {
           configuration.events.push({name, description});
@@ -184,27 +199,6 @@
           element[item.name] = item.value;
         }
       }
-
-      _configurationChanged(configuration) {
-        for (let type in configuration) {
-          configuration[type].forEach((property, index) => {
-            if (type == 'Event') {
-              if (!configuration.Fired) {
-                this.set('configuration.Fired', []);
-              }
-              this.element.addEventListener(property.name, ev => {
-                this.unshift(`configuration.Fired`, {name: property.name, detail: JSON.stringify(ev.detail)});
-              });
-            } else {
-              let attribute = property.name.replace( /([A-Z])/g, "-$1" ).toLowerCase();
-              this.element.addEventListener(`${attribute}-changed`, ev => {
-                this.set(`configuration.${type}.${index}.value`, ev.detail.value);
-              });
-            }
-          });
-        }
-      }
-
     }
 
     window.customElements.define(PaperSandbox.is, PaperSandbox);

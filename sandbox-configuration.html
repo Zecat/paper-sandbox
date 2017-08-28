@@ -20,24 +20,44 @@
     <style>
       :host {
         display: block;
-      }
-      #bindedProps {
-        @apply --layout-horizontal;
-      }
-      .vertical {
         @apply --layout-vertical;
       }
+      .section {
+        @apply --layout-horizontal;
+        @apply --layout-wrap;
+        padding: 24px 42px;
+        border-top: 1px solid var(--paper-grey-200);
+      }
+      :host .section:nth-of-type(2n) {
+        background: var(--paper-grey-100);
+      }
+      :host .section:nth-of-type(2n + 1) {
+        background: var(--paper-grey-50);
+      }
       .subheader {
+        display: none;
         @apply --paper-font-subhead;
+      }
+      paper-sandbox-method {
+        margin:  8px;
+        width: 200px;
+      }
+      .booleans paper-checkbox {
+        padding: 12px;
+        border-right: 1px solid var(--paper-grey-300);
+        width: 164px;
+        text-align: center;
+      }
+      paper-input {
+        padding: 8px 12px;
       }
       
     </style>
 
     <!-- TODO: give the tooltips a better style using prism-hightlighter -->
-    <div id="bindedProps">
 
       <template is="dom-if" if="[[configuration.methods.length]]">
-        <div class="vertical methods">
+        <div class="section methods">
           <div class="subheader">Methods</div>
           <template
             is="dom-repeat"
@@ -54,56 +74,51 @@
         </div>
       </template>
 
+      <!-- IDEA: Experiment grid layout on this -->
       <template is="dom-if" if="[[configuration.properties.boolean.length]]">
-        <div class="vertical">
+        <div class="section booleans">
           <div class="subheader">Boolean properties</div>
           <template
             is="dom-repeat"
             items="{{configuration.properties.boolean}}"
             filter="[[filterFn]]"
           >
-            <paper-item>
-              <paper-checkbox checked="{{item.value}}">[[_toHyphen(item.name)]]</paper-checkbox>
-              <paper-tooltip>[[item.description]]</paper-tooltip>
-            </paper-item>
+            <paper-checkbox checked="{{item.value}}">[[_toHyphen(item.name)]]</paper-checkbox>
+              <!-- <paper-tooltip>[[item.description]]</paper-tooltip> -->
           </template>
         </div>
       </template>
 
       <template is="dom-if" if="[[configuration.properties.string.length]]">
-        <div class="vertical">
+        <div class="section">
           <div class="subheader">String properties</div>
           <template
             is="dom-repeat"
             items="{{configuration.properties.string}}"
             filter="[[filterFn]]"
           >
-            <paper-item>
             <paper-input label="[[_toHyphen(item.name)]]" value="{{item.value}}"></paper-input>
-            <paper-tooltip>[[item.description]]</paper-tooltip>
-          </paper-item>
+            <!-- <paper-tooltip>[[item.description]]</paper-tooltip> -->
           </template>
         </div>
       </template>
 
       <template is="dom-if" if="[[configuration.properties.number.length]]">
-        <div class="vertical">
+        <div class="section">
           <div class="subheader">Number properties</div>
           <template
             is="dom-repeat"
             items="{{configuration.properties.number}}"
             filter="[[filterFn]]"
           >
-            <paper-item>
             <paper-input label="[[_toHyphen(item.name)]]" value="{{item.value}}"></paper-input>
-            <paper-tooltip>[[item.description]]</paper-tooltip>
-          </paper-item>
+            <!-- <paper-tooltip>[[item.description]]</paper-tooltip> -->
           </template>
         </div>
       </template>
 
       <template is="dom-if" if="[[configuration.event.length]]">
-        <div class="vertical">
+        <div class="section">
           <div class="subheader">Events</div>
           <template
             is="dom-repeat"
@@ -111,43 +126,12 @@
           >
             <paper-item>
               [[item.name]]
-              <paper-tooltip>[[item.description]]</paper-tooltip>
+              <!-- <paper-tooltip>[[item.description]]</paper-tooltip> -->
             </paper-item>
           </template>
         </div>
       </template>
 
-      <template is="dom-if" if="[[configuration.event.length]]">
-        <div class="vertical">
-          <div class="subheader">Events fired</div>
-          <template
-            is="dom-repeat"
-            items="{{configuration.fired}}"
-          >
-            <paper-item>
-              [[item.name]]
-              <paper-tooltip>[[item.detail]]</paper-tooltip>
-            </paper-item>
-          </template>
-        </div>
-      </template>
-
-      <template is="dom-if" if="[[configuration.promise]]">
-        <div class="vertical">
-          <div class="subheader">Promise properties</div>
-            <template
-              is="dom-repeat"
-              items="{{configuration.promise}}"
-              filter="[[filterFn]]"
-            >
-            <paper-item>
-              [[item.name]]
-              <paper-tooltip>[[item.description]]</paper-tooltip>
-            </paper-item>
-          </template>
-        </div>
-      </template>
-  </div>
   </template>
 
   <script>
@@ -200,8 +184,8 @@
       }
 
       _methodTriggeredHandler(e) {
-        let model = e.model;
-        model.set('item.lastResponse', this.element[model.item.name]());
+        const {model} = e, {item: {name, params}} = model;
+        model.set('item.lastResponse', this.element[name](...params.map(p => p.value)));
       }
     }
 
