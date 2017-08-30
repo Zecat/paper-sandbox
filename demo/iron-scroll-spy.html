@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>paper-sandbox demo</title>
+
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <link rel="import" href="../../iron-scroll-spy/iron-auto-scroll-spy.html">
+    <link rel="import" href="../paper-sandbox.html">
+
+  </head>
+  <style>
+    body {
+      min-height: 100vh;
+      margin: 0;
+    }
+    paper-sandbox {
+      
+    }
+  </style>
+  <body>
+
+    <paper-sandbox tag="iron-auto-scroll-spy">
+      <template>
+      <style is="custom-style">
+              app-header {
+                background: var(--primary-color);
+                color: white;
+              }
+              iron-auto-scroll-spy {
+                height: 500px;
+              }
+              iron-auto-scroll-spy div {
+                padding: 150px;
+                border-bottom: 1px solid grey;
+                transition: background 0.2s;
+              }
+            </style>
+
+        <app-header-layout>
+
+              <app-header slot="header" fixed>
+                <app-toolbar>
+                  <paper-tabs selected="{{scrollSelected}}">
+                    <paper-tab>Section A</paper-tab>
+                    <paper-tab>Section B</paper-tab>
+                    <paper-tab>Section C</paper-tab>
+                    <paper-tab>Section D</paper-tab>
+                    <paper-tab>Section E</paper-tab>
+                    <paper-tab>Section F</paper-tab>
+                    <paper-tab>Section G</paper-tab>
+                    <paper-tab>Section H</paper-tab>
+                  </paper-tabs>
+                </app-toolbar>
+              </app-header>
+
+              <iron-auto-scroll-spy selected="{{scrollSelected}}">
+                <div> <h1>Section A</h1> </div>
+                <div> <h1>Section B</h1> </div>
+                <div> <h1>Section C</h1> </div>
+                <div> <h1>Section D</h1> </div>
+                <div> <h1>Section E</h1> </div>
+                <div> <h1>Section F</h1> </div>
+                <div> <h1>Section G</h1> </div>
+                <div> <h1>Section H</h1> </div>
+              </iron-auto-scroll-spy>
+
+            </app-header-layout>
+      </template>
+    </paper-sandbox>
+
+  </body>
+</html>

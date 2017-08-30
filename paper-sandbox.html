@@ -8,6 +8,7 @@
     <style>
       :host {
         display: block;
+        @apply --layout-vertical;
       }
       #demoContainer {
         @apply --paper-sandbox-demo-container;
@@ -15,9 +16,18 @@
         max-width: 300px;
         margin: 42px auto;
       }
+      sandbox-configuration {
+        position: fixed;
+        top: 0;
+        left: 0;
+        overflow: auto;
+        height: 100vh;
+        /* position: absolute; */
+        /* bottom: 0; */
+      }
     </style>
 
-    <slot on-slotchange="_slotChangeHandler"></slot>
+    <slot id="slot" on-slotchange="_slotChangeHandler"></slot>
 
     <div id="demoContainer"></div>
 
@@ -36,7 +46,7 @@
      * #appliesMixin 
      * @customElement
      * @polymer
-     * @demo demo
+     * @demo demo/index.html
      */
     class PaperSandbox extends Polymer.Element {
 
@@ -81,6 +91,11 @@
         super.disconnectedCallback();
       }
 
+      ready() {
+        super.ready()
+        this._assignedNodesChange(this.$.slot.assignedNodes({flatten: true}));
+      }
+
       async fetchDescriptorForElement(el, analysisPath) {
         if (!el) throw new Error('No element specified to retrieve analysis');
         // TODO: The custom element check could be improved following this example:
@@ -115,9 +130,12 @@
         return configForEl;
       }
 
-      async _slotChangeHandler(e) {
+      _slotChangeHandler(e) {
         // TODO: test
         const assignedNodes = e.target.assignedNodes({flatten: true});
+      }
+
+      async _assignedNodesChange(assignedNodes) {
         if (!assignedNodes) return;
 
         // Find the first template 
@@ -159,6 +177,9 @@
         let configuration = this.emptyConfiguration;
 
         for (let {type, name, description, privacy} of descriptor.properties) {
+          if (!configuration.properties[type]) {
+            configuration.properties[type] = [];
+          } 
           configuration.properties[type].push({
             name,
             description,

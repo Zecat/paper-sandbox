@@ -5,130 +5,186 @@
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-styles/typography.html">
+<link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="paper-sandbox-method.html">
-
-<!--
-`sandbox-configuration`
-
-
--->
 
 <dom-module id="sandbox-configuration">
   <template strip-whitespace>
     <style>
       :host {
         display: block;
-        @apply --layout-vertical;
+        position: relative;
+        /* @apply --layout-horizontal; */
+        /* @apply --layout-wrap; */
       }
       .section {
-        @apply --layout-horizontal;
-        @apply --layout-wrap;
-        padding: 24px 42px;
-        border-top: 1px solid var(--paper-grey-200);
+        @apply --layout-vertical;
+        /* border-left: 1px solid var(--paper-grey-300); */
       }
-      :host .section:nth-of-type(2n) {
-        background: var(--paper-grey-100);
-      }
-      :host .section:nth-of-type(2n + 1) {
+      :host .section {
         background: var(--paper-grey-50);
       }
       .subheader {
-        display: none;
+        border-top: 1px solid var(--paper-grey-200);
         @apply --paper-font-subhead;
+        position: sticky;
+        top: 0;
+        background: var(--paper-grey-100);
+        height: 64px;
+        padding: 0 64px;
+        line-height: 64px;
+        vertical-align: middle;
+        z-index: 1;
+        @apply --shadow-transition;
+      }
+      /* .section.up + dom-if + .section .subheader {
+        @apply --shadow-elevation-2dp;
+      } */
+      .section.up .subheader {
+        @apply --shadow-elevation-2dp;
+      }
+      .booleans {
+        @apply --layout-flex;
+        @apply --layout-vertical;
       }
       paper-sandbox-method {
         margin:  8px;
-        width: 200px;
+        /* width: 200px; */
+        min-width: 200px;
+        height: 40px;
       }
       .booleans paper-checkbox {
-        padding: 12px;
-        border-right: 1px solid var(--paper-grey-300);
-        width: 164px;
-        text-align: center;
+        padding: 8px;
+        /* border-right: 1px solid var(--paper-grey-300); */
+        /* width: 164px; */
+        /* text-align: center; */
+      }
+      .strings {
+        @apply --layout-vertical;
+        @apply --layout-flex;
+        /* max-width: 300px; */
+      }
+      .numbers {
+        @apply --layout-vertical;
+        @apply --layout-flex;
       }
       paper-input {
-        padding: 8px 12px;
+        /* padding: 8px 12px; */
+        padding: 0 12px;
+
+      }
+      /* .toto {
+        display: grid;
+        grid-template-rows: minmax(40px, auto);
+        grid-template-columns: repeat(auto-fill, 200px);
+        padding: 24px 42px;
+        border-top: 1px solid var(--paper-grey-200);
+      } */
+
+      #moreBtn {
+        display: block;
+        position: sticky;
+        top: 12px;
+        margin-left: 12px;
+        z-index: 2;
+        margin-top: -40px;
+      }
+      .list {
+        padding: 24px;
+                @apply --layout-vertical;
+
       }
       
     </style>
-
+    <paper-icon-button id="moreBtn" icon="more-vert"></paper-icon-button>
     <!-- TODO: give the tooltips a better style using prism-hightlighter -->
-
-      <template is="dom-if" if="[[configuration.methods.length]]">
-        <div class="section methods">
-          <div class="subheader">Methods</div>
-          <template
-            is="dom-repeat"
-            items="{{configuration.methods}}"
-            filter="[[filterFn]]"
-          >
-            <paper-sandbox-method
-                name="[[item.name]]"
-                description="[[item.description]]"
-                params="{{item.params}}"
-                on-method-triggered="_methodTriggeredHandler">
-            </paper-sandbox-method>
-          </template>
-        </div>
-      </template>
 
       <!-- IDEA: Experiment grid layout on this -->
       <template is="dom-if" if="[[configuration.properties.boolean.length]]">
         <div class="section booleans">
           <div class="subheader">Boolean properties</div>
-          <template
-            is="dom-repeat"
-            items="{{configuration.properties.boolean}}"
-            filter="[[filterFn]]"
-          >
-            <paper-checkbox checked="{{item.value}}">[[_toHyphen(item.name)]]</paper-checkbox>
-              <!-- <paper-tooltip>[[item.description]]</paper-tooltip> -->
-          </template>
+          <div class="list">
+            <template
+              is="dom-repeat"
+              items="{{configuration.properties.boolean}}"
+              filter="[[filterFn]]"
+            >
+              <paper-checkbox checked="{{item.value}}">[[_toHyphen(item.name)]]</paper-checkbox>
+                <!-- <paper-tooltip>[[item.description]]</paper-tooltip> -->
+            </template>
+          </div>
         </div>
       </template>
 
       <template is="dom-if" if="[[configuration.properties.string.length]]">
-        <div class="section">
+        <div class="section strings">
           <div class="subheader">String properties</div>
-          <template
-            is="dom-repeat"
-            items="{{configuration.properties.string}}"
-            filter="[[filterFn]]"
-          >
-            <paper-input label="[[_toHyphen(item.name)]]" value="{{item.value}}"></paper-input>
-            <!-- <paper-tooltip>[[item.description]]</paper-tooltip> -->
-          </template>
+          <div class="list">
+            <template
+              is="dom-repeat"
+              items="{{configuration.properties.string}}"
+              filter="[[filterFn]]"
+            >
+              <paper-input label="[[_toHyphen(item.name)]]" value="{{item.value}}"></paper-input>
+              <!-- <paper-tooltip>[[item.description]]</paper-tooltip> -->
+            </template>
+          </div>
         </div>
       </template>
 
       <template is="dom-if" if="[[configuration.properties.number.length]]">
-        <div class="section">
+        <div class="section numbers">
           <div class="subheader">Number properties</div>
-          <template
-            is="dom-repeat"
-            items="{{configuration.properties.number}}"
-            filter="[[filterFn]]"
-          >
-            <paper-input label="[[_toHyphen(item.name)]]" value="{{item.value}}"></paper-input>
-            <!-- <paper-tooltip>[[item.description]]</paper-tooltip> -->
-          </template>
+            <div class="list">
+            <template
+              is="dom-repeat"
+              items="{{configuration.properties.number}}"
+              filter="[[filterFn]]"
+            >
+              <paper-input type="number" label="[[_toHyphen(item.name)]]" value="{{item.value}}"></paper-input>
+              <!-- <paper-tooltip>[[item.description]]</paper-tooltip> -->
+            </template>
+          </div>
         </div>
       </template>
 
       <template is="dom-if" if="[[configuration.event.length]]">
         <div class="section">
           <div class="subheader">Events</div>
-          <template
-            is="dom-repeat"
-            items="{{configuration.event}}"
-          >
-            <paper-item>
-              [[item.name]]
-              <!-- <paper-tooltip>[[item.description]]</paper-tooltip> -->
-            </paper-item>
-          </template>
+            <div class="list">
+            <template
+              is="dom-repeat"
+              items="{{configuration.event}}"
+            >
+              <paper-item>
+                [[item.name]]
+                <!-- <paper-tooltip>[[item.description]]</paper-tooltip> -->
+              </paper-item>
+            </template>
+          </div>
+        </div>
+      </template>
+
+      <template is="dom-if" if="[[configuration.methods.length]]">
+        <div class="section methods">
+          <div class="subheader">Methods</div>
+            <div class="list">
+            <template
+              is="dom-repeat"
+              items="{{configuration.methods}}"
+              filter="[[filterFn]]"
+            >
+              <paper-sandbox-method
+                  name="[[item.name]]"
+                  description="[[item.description]]"
+                  params="{{item.params}}"
+                  on-method-triggered="_methodTriggeredHandler">
+              </paper-sandbox-method>
+            </template>
+          </div>
         </div>
       </template>
 
@@ -164,6 +220,68 @@
             notify: true
           }
         };
+      }
+
+      constructor() {
+        super();
+        // const toolbarHeight = 64,
+        // options = {
+        //   root: this,
+          // rootMargin: `-${toolbarHeight}px 0px 0px 0px`,
+        // },
+        // callback = ({[0]: entry}, observer) => {
+        //   console.log(entry);
+        //   if (entry.isIntersecting) {
+        //     target.classList.toggle('shadow', true);
+        //   } else {
+        //     target.classList.toggle('shadow', false);
+        //   }
+        // },
+        // observer = new IntersectionObserver(callback, options),
+        
+        // !!!
+        // 
+        // const target = this.shadowRoot.querySelector('.booleans');
+
+        // const callback = ({[0]: entry}) => {
+        //   // console.log(entry);
+        //   console.log((entry.rootBounds.top + entry.boundingClientRect.bottom));
+        //   if (!entry.isIntersecting && (entry.rootBounds.top + entry.boundingClientRect.bottom) <= 0) {
+        //     console.log('prout');
+        //     entry.target.classList.toggle('up', true);
+        //   } else {
+        //                 entry.target.classList.toggle('up', false);
+
+        //   }
+        // };
+
+
+        const callback = ({[0]: entry}) => {
+          // console.log(entry);
+          console.log(entry);
+          // if (entry.isIntersecting) {
+            entry.target.classList.toggle('up', entry.isIntersecting);
+            
+          // }
+          // if (!entry.isIntersecting && (entry.rootBounds.top + entry.boundingClientRect.bottom) <= 0) {
+          //   console.log('prout');
+          //   entry.target.classList.toggle('up', true);
+          // } else {
+          //               entry.target.classList.toggle('up', false);
+
+          // }
+        };
+          
+        const leavingObserver = new IntersectionObserver(callback, {root: this, rootMargin: "100px 0px -101% 0px"});
+        setTimeout(() => {
+        const targets = this.shadowRoot.querySelectorAll('.section');
+
+
+        for (let t of targets) {console.log(t);
+          leavingObserver.observe(t);
+        }
+        }, 300);
+        // leavingObserver.observe(target.nextSibling.nextSibling);
       }
 
       _stopEventPropagation(e) {console.log(e);
