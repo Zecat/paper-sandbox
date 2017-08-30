@@ -1,0 +1,31 @@
+<script>
+
+  if (!window.Zecat) {
+    window.Zecat = {};
+  }
+  
+  /**
+   * 
+   * 
+   * @polymer
+   * @mixinFunction
+   * @appliesMixin Zecat.IronAutoScrollMixin
+   * @appliesMixin Zecat.IronScrollSpyMixin
+   */
+  Zecat.SandboxDescriptorMixin = (superClass) => class extends superClass {
+
+    constructor() {
+      super();
+    }
+
+    connectedCallback() {
+      super.connectedCallback();
+    }
+
+    disconnectedCallback() {
+      super.disconnectedCallback();
+    }
+
+  }
+
+</script>

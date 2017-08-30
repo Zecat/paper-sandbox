@@ -22,8 +22,6 @@
         left: 0;
         overflow: auto;
         height: 100vh;
-        /* position: absolute; */
-        /* bottom: 0; */
       }
     </style>
 
@@ -131,7 +129,6 @@
       }
 
       _slotChangeHandler(e) {
-        // TODO: test
         const assignedNodes = e.target.assignedNodes({flatten: true});
       }
 
@@ -177,6 +174,7 @@
         let configuration = this.emptyConfiguration;
 
         for (let {type, name, description, privacy} of descriptor.properties) {
+          // TODO: manage multi types
           if (!configuration.properties[type]) {
             configuration.properties[type] = [];
           } 
