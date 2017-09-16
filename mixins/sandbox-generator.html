@@ -1,5 +1,6 @@
 <link rel="import" href="fetch-analysis.html">
 <link rel="import" href="parse-analysis.html">
+<link rel="import" href="bind-element-to-descriptor.html">
 
 <script>
 (()=> {
@@ -15,7 +16,17 @@
    * @appliesMixin Zecat.ParseAnalysis
    * @appliesMixin Zecat.FetchAnalysis
    */
-  Zecat.SandboxGenerator = superClass => class extends Zecat.ParseAnalysis(Zecat.FetchAnalysis(superClass)) {
+  Zecat.SandboxGenerator = superClass => class extends
+    Zecat.BindElementToDescriptor(Zecat.ParseAnalysis(Zecat.FetchAnalysis(superClass))) {
+
+    static get properties() {
+      return {
+        descriptor: {
+          type: Object,
+          value: () => ({})
+        }
+      };
+    }
 
     static get observers() {
       return [
@@ -27,7 +38,7 @@
       if (!analyzedElement) return;
       
       try {
-        this.generateDescriptor(
+        this.descriptor = this.parseAnalysis(
           await this.fetchAnalysisForElement(this.analyzedElement));
       } 
       catch (err) {

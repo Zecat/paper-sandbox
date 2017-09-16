@@ -1,0 +1,84 @@
+<script>
+  
+(()=> {
+  'use strict';
+
+  if (!window.Zecat) window.Zecat = {};
+
+  /**
+   * 
+   * 
+   * @polymer
+   * @mixinFunction
+   */
+  Zecat.BindElementToDescriptor = (superClass) => class extends superClass {
+
+    static get properties() {
+      return {
+        descriptor: {
+          type: Object,
+          value: () => ({})
+        },
+        /**
+         * @type {HTMLElement}
+         */
+        analyzedElement: {
+          type: Object,
+          notify: true
+        }
+      };
+    }
+
+    static get observers() {
+      return [
+        '_updateElementAttribute(descriptor.properties.*, analyzedElement)',
+        '_bindElementAttributesToDescriptor(descriptor.properties)'
+      ];
+    }
+
+    constructor() {
+      super();
+      this._attributeChanged_boundListeners = {};
+    }
+
+    connectedCallback() {
+      super.connectedCallback();
+    }
+
+    disconnectedCallback() {
+      super.disconnectedCallback();
+    }
+
+    _bindElementAttributesToDescriptor(descriptorProperties) {
+      if (!descriptorProperties) return;
+
+      for (let [type, typedProperties] of Object.entries(descriptorProperties)) {
+        typedProperties.forEach(({name, notify = false}, i) => {
+          if (!notify) return;
+          const hyphenatedName = name.replace( /([A-Z])/g, "-$1" ).toLowerCase();
+          const callback = e => {
+            this.set(`descriptor.properties.${type}.${i}.value`, e.detail.value);
+          };
+          // Keep a reference to the callback for future event listener removal
+          this._attributeChanged_boundListeners[name] = callback;
+          this.analyzedElement.addEventListener(`${hyphenatedName}-changed`, callback);
+        });
+      }
+    }
+
+    _updateElementAttribute(cr, element) {
+      const nameSubpath = cr.path.indexOf('.value');
+      if (nameSubpath >= 0) {
+        // const type = cr.path.split('.')[2];
+        const itempath = cr.path.substring(0, nameSubpath);
+        const item = this.get(itempath);
+        // const index = cr.base[type].indexOf(item);
+        element[item.name] = item.value;
+      }
+    }
+
+  };
+})();
+  
+
+</script>

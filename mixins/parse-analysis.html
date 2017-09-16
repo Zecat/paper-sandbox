@@ -13,31 +13,8 @@
    */
   Zecat.ParseAnalysis = (superClass) => class extends superClass {
 
-    static get properties() {
-      return {
-        descriptor: {
-          type: Object,
-          value: () => ({})
-        },
-        /**
-         * @type {HTMLElement}
-         */
-        analyzedElement: {
-          type: Object,
-          notify: true
-        }
-      };
-    }
-
-    static get observers() {
-      return [
-        '_updateElementAttribute(descriptor.properties.*, analyzedElement)'
-      ];
-    }
-
     constructor() {
       super();
-      this._attributeChanged_boundListeners = {};
     }
 
     connectedCallback() {
@@ -62,20 +39,25 @@
       };
     }
 
-    generateDescriptor(analysis) {
+    parseAnalysis(analysis) {
       let descriptor = this.emptySandboxDescriptor;
 
-      for (let {type, name, description, privacy} of analysis.properties) {
+      for (let {type, name, description, privacy, metadata} of analysis.properties) {
         // TODO: manage multi types
         if (!descriptor.properties[type]) {
           descriptor.properties[type] = [];
         }
-        descriptor.properties[type].push({
+        let propertyDescriptor = {
           name,
           description,
           privacy,
           value: undefined
-        });
+        };
+        if (metadata.polymer && Object.keys(metadata.polymer).length) {
+          // assign any polymer metadata (notify, readOnly...)
+          propertyDescriptor = Object.assign(propertyDescriptor, metadata.polymer);
+        }
+        descriptor.properties[type].push(propertyDescriptor);
       }
       for (let {name, description, params, privacy} of analysis.methods) {
         descriptor.methods.push({
@@ -89,33 +71,8 @@
         descriptor.events.push({name, description});
       }
       Object.assign(descriptor, {styling: analysis.styling, slots: analysis.slots, tagname: analysis.tagname});
-
-      this.descriptor = descriptor;
-
-      this.bindAttributesToDescriptor(analysis.attributes);
-    }
-
-    bindAttributesToDescriptor(attributes) {
-      if (!attributes || !(attributes instanceof Array)) return;
-      // TODO: remove previous event listeners
-      attributes.forEach(({type, name}, i) => {
-        this.analyzedElement.addEventListener(`${name}-changed`, (
-          this._attributeChanged_boundListeners[name] = e => {
-            this.set(`descriptor.attributes.${type}.${i}.value`, e.detail.value);
-          })
-        );
-      })
-    }
-
-    _updateElementAttribute(cr, element) {
-      const nameSubpath = cr.path.indexOf('.value');
-      if (nameSubpath >= 0) {
-        // const type = cr.path.split('.')[2];
-        const itempath = cr.path.substring(0, nameSubpath);
-        const item = this.get(itempath);
-        // const index = cr.base[type].indexOf(item);
-        element[item.name] = item.value;
-      }
+      
+      return descriptor;
     }
 
   };
