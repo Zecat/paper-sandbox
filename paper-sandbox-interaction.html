@@ -10,7 +10,7 @@
 <link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="paper-sandbox-method.html">
 
-<dom-module id="paper-sandbox-configuration">
+<dom-module id="paper-sandbox-interaction">
   <template strip-whitespace>
     <style>
       :host {
@@ -171,9 +171,9 @@
      * @customElement
      * @polymer
      */
-    class PaperSandboxConfiguration extends Polymer.Element {
+    class PaperSandboxInteraction extends Polymer.Element {
 
-      static get is() { return 'paper-sandbox-configuration'; }
+      static get is() { return 'paper-sandbox-interaction'; }
 
       static get properties() {
         return {
@@ -200,6 +200,7 @@
 
         Polymer.RenderStatus.afterNextRender(this, () => {
           const callback = ({[0]: entry}) => {
+            entry.target.classList.toggle('elevated', entry.isIntersecting);
           };
           const targets = this.shadowRoot.querySelectorAll('.section');
           for (let target of targets) {
@@ -234,7 +235,7 @@
       }
     }
 
-    window.customElements.define(PaperSandboxConfiguration.is, PaperSandboxConfiguration);
+    window.customElements.define(PaperSandboxInteraction.is, PaperSandboxInteraction);
 
   </script>
 </dom-module>

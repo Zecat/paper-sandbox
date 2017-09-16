@@ -1,0 +1,47 @@
+<link rel="import" href="fetch-analysis.html">
+<link rel="import" href="parse-analysis.html">
+
+<script>
+(()=> {
+  'use strict';
+
+  if (!window.Zecat) window.Zecat = {};
+  
+  /**
+   * 
+   * 
+   * @polymer
+   * @mixinFunction
+   * @appliesMixin Zecat.ParseAnalysis
+   * @appliesMixin Zecat.FetchAnalysis
+   */
+  Zecat.SandboxGenerator = superClass => class extends Zecat.ParseAnalysis(Zecat.FetchAnalysis(superClass)) {
+
+    static get observers() {
+      return [
+        '_analyzedElementChanged(analyzedElement)'
+      ];
+    }
+    
+    async _analyzedElementChanged(analyzedElement) {
+      if (!analyzedElement) return;
+      
+      try {
+        this.generateDescriptor(
+          await this.fetchAnalysisForElement(this.analyzedElement));
+      } 
+      catch (err) {
+        this.analysisErrorCode = err.code;
+        this.dispatchEvent(
+          new CustomEvent(
+            'analysis-error',
+            {
+              detail: err,
+              bubbles: true,
+              composed: true
+            }));
+      }
+    }
+  };
+})();
+</script>

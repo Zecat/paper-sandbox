@@ -11,7 +11,7 @@
    * @polymer
    * @mixinFunction
    */
-  Zecat.SandboxDescriptorMixin = (superClass) => class extends superClass {
+  Zecat.ParseAnalysis = (superClass) => class extends superClass {
 
     static get properties() {
       return {
@@ -22,7 +22,10 @@
         /**
          * @type {HTMLElement}
          */
-        analyzedElement: Object
+        analyzedElement: {
+          type: Object,
+          notify: true
+        }
       };
     }
 
@@ -59,7 +62,7 @@
       };
     }
 
-    set analysis(analysis) {
+    generateDescriptor(analysis) {
       let descriptor = this.emptySandboxDescriptor;
 
       for (let {type, name, description, privacy} of analysis.properties) {
