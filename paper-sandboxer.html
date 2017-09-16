@@ -1,5 +1,8 @@
 <link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../shadycss/apply-shim.html">
+<link rel="import" href="../app-layout/app-drawer-layout/app-drawer-layout.html">
+<link rel="import" href="../app-layout/app-drawer/app-drawer.html">
+<link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="paper-sandbox.html">
 
 <dom-module id="paper-sandboxer">
@@ -8,25 +11,25 @@
       :host {
         display: block;
         @apply --layout-vertical;
+        --app-drawer-width: 800px;
       }
-      #demoContainer {
-        @apply --paper-sandbox-demo-container;
-        @apply --layout-center;
-        max-width: 300px;
-        margin: 42px auto;
+      app-drawer {
+        border-right: 1px solid var(--paper-grey-200);
       }
       paper-sandbox {
-        position: fixed;
-        top: 0;
-        left: 0;
         overflow: auto;
-        height: 100vh;
+        height: 100%;
       }
     </style>
 
-    <slot id="slot" on-slotchange="_slotChangeHandler"></slot>
-
-    <paper-sandbox id="sandbox"></paper-sandbox>
+    <app-drawer-layout responsive-width="1100px">
+      <app-drawer slot="drawer">
+        <paper-sandbox id="sandbox"></paper-sandbox>
+      </app-drawer>
+      <div>
+        <slot id="slot" on-slotchange="_slotChangeHandler"></slot>
+      </div>
+    </app-drawer-layout>
 
   </template>
 
