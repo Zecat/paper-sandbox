@@ -1,21 +1,40 @@
 <script>
-
-  if (!window.Zecat) {
-    window.Zecat = {};
-  }
   
+(()=> {
+  'use strict';
+
+  if (!window.Zecat) window.Zecat = {};
+
   /**
    * 
    * 
    * @polymer
    * @mixinFunction
-   * @appliesMixin Zecat.IronAutoScrollMixin
-   * @appliesMixin Zecat.IronScrollSpyMixin
    */
   Zecat.SandboxDescriptorMixin = (superClass) => class extends superClass {
 
+    static get properties() {
+      return {
+        descriptor: {
+          type: Object,
+          value: () => ({})
+        },
+        /**
+         * @type {HTMLElement}
+         */
+        analyzedElement: Object
+      };
+    }
+
+    static get observers() {
+      return [
+        '_updateElementAttribute(descriptor.properties.*, analyzedElement)'
+      ];
+    }
+
     constructor() {
       super();
+      this._attributeChanged_boundListeners = {};
     }
 
     connectedCallback() {
@@ -26,6 +45,78 @@
       super.disconnectedCallback();
     }
 
-  }
+    get emptySandboxDescriptor() {
+      return {
+        properties: {
+          boolean: [],
+          string: [],
+          number: [],
+          object: [],
+          function: []
+        },
+        events: [],
+        methods: []
+      };
+    }
+
+    set analysis(analysis) {
+      let descriptor = this.emptySandboxDescriptor;
+
+      for (let {type, name, description, privacy} of analysis.properties) {
+        // TODO: manage multi types
+        if (!descriptor.properties[type]) {
+          descriptor.properties[type] = [];
+        }
+        descriptor.properties[type].push({
+          name,
+          description,
+          privacy,
+          value: undefined
+        });
+      }
+      for (let {name, description, params, privacy} of analysis.methods) {
+        descriptor.methods.push({
+          name,
+          description,
+          params: params.map(p => Object.assign(p, {value: undefined})),
+          privacy
+        });
+      }
+      for (let {name, description} of analysis.events) {
+        descriptor.events.push({name, description});
+      }
+      Object.assign(descriptor, {styling: analysis.styling, slots: analysis.slots, tagname: analysis.tagname});
+
+      this.descriptor = descriptor;
+
+      this.bindAttributesToDescriptor(analysis.attributes);
+    }
+
+    bindAttributesToDescriptor(attributes) {
+      if (!attributes || !(attributes instanceof Array)) return;
+      // TODO: remove previous event listeners
+      attributes.forEach(({type, name}, i) => {
+        this.analyzedElement.addEventListener(`${name}-changed`, (
+          this._attributeChanged_boundListeners[name] = e => {
+            this.set(`descriptor.attributes.${type}.${i}.value`, e.detail.value);
+          })
+        );
+      })
+    }
+
+    _updateElementAttribute(cr, element) {
+      const nameSubpath = cr.path.indexOf('.value');
+      if (nameSubpath >= 0) {
+        // const type = cr.path.split('.')[2];
+        const itempath = cr.path.substring(0, nameSubpath);
+        const item = this.get(itempath);
+        // const index = cr.base[type].indexOf(item);
+        element[item.name] = item.value;
+      }
+    }
+
+  };
+})();
+  
 
 </script>

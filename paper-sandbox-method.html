@@ -4,6 +4,7 @@
 <link rel="import" href="../paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../paper-badge/paper-badge.html">
 <link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../paper-listbox/paper-listbox.html">
 <link rel="import" href="../paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../paper-menu-button/paper-menu-button-animations.html">
@@ -64,6 +65,7 @@
       [[_uppercaseToSpace(name)]]
       <paper-tooltip>[[description]]</paper-tooltip>
     </paper-button>
+
     <template is="dom-if" if="[[params.length]]">
       <paper-menu-button
           id="paramsMenuButton"
@@ -82,25 +84,15 @@
         <paper-listbox slot="dropdown-content">
           <template is="dom-repeat" items="[[params]]">
             <paper-item>
-              <paper-input label="[[item.name]]" value="{{item.value}}"></paper-input>
+              <paper-input
+                  label="[[item.name]]"
+                  value="{{item.value}}">
+              </paper-input>
             </paper-item>
           </template>
         </paper-listbox>
       </paper-menu-button>
     </template>
-
-    <!-- <paper-tooltip>
-      <template
-        is="dom-repeat"
-        items="[[item.params]]" as="param">
-        [[param.description]]<br>
-        [[param.name]]<br>
-        [[param.type]]
-      </template>
-    </paper-tooltip> -->
-
-    <!-- TODO: Use a dropdown to display the response -->
-    <!-- <paper-icon-button on-tap="_handleFunctionButtonTap" icon="send"></paper-icon-button>[[item.lastResponse]] -->
 
   </template>
 
@@ -108,7 +100,7 @@
     /**
      * Missing Description
      * 
-     * #appliesMixin 
+     * @appliesMixin Polymer.GestureEventListeners 
      * @customElement
      * @polymer
      */

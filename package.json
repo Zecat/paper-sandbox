@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+  },
+  "name": "paper-sandbox",
+  "version": "0.0.4",
+  "description": "Creates a sandbox to play with your Polymer element",
+  "main": "index.js",
+  "repository": "https://github.com/Zecat/paper-sandbox.git",
+  "author": "felix <felix.jullien@ecoco2.com>",
+  "license": "MIT"
+}

@@ -1,6 +1,5 @@
 <link rel="import" href="../polymer/polymer-element.html">
 <link rel="import" href="../paper-input/paper-input.html">
-<!-- <link rel="import" href="../paper-toggle-button/paper-toggle-button.html"> -->
 <link rel="import" href="../paper-tooltip/paper-tooltip.html">
 <link rel="import" href="../paper-item/paper-item.html">
 <link rel="import" href="../iron-icons/iron-icons.html">
@@ -11,7 +10,7 @@
 <link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="paper-sandbox-method.html">
 
-<dom-module id="sandbox-configuration">
+<dom-module id="paper-sandbox-configuration">
   <template strip-whitespace>
     <style>
       :host {
@@ -91,17 +90,19 @@
         grid-template-columns: 1fr 1fr 1fr;
       }
     </style>
+
     <paper-icon-button id="moreBtn" icon="more-vert"></paper-icon-button>
       <template is="dom-if" if="[[configuration.properties.boolean.length]]">
         <div class="section booleans">
           <div class="type-header">Boolean properties</div>
           <div class="list">
             <template
-              is="dom-repeat"
-              items="{{configuration.properties.boolean}}"
-              filter="[[filterFn]]"
-            >
-              <paper-checkbox checked="{{item.value}}">[[_toHyphen(item.name)]]</paper-checkbox>
+                is="dom-repeat"
+                items="{{configuration.properties.boolean}}"
+                filter="[[filterFn]]">
+              <paper-checkbox checked="{{item.value}}">
+                [[_toHyphen(item.name)]]
+              </paper-checkbox>
             </template>
           </div>
         </div>
@@ -112,11 +113,13 @@
           <div class="type-header">String properties</div>
           <div class="list">
             <template
-              is="dom-repeat"
-              items="{{configuration.properties.string}}"
-              filter="[[filterFn]]"
-            >
-              <paper-input label="[[_toHyphen(item.name)]]" value="{{item.value}}"></paper-input>
+                is="dom-repeat"
+                items="{{configuration.properties.string}}"
+                filter="[[filterFn]]">
+              <paper-input
+                  label="[[_toHyphen(item.name)]]"
+                  value="{{item.value}}">
+              </paper-input>
             </template>
           </div>
         </div>
@@ -125,13 +128,16 @@
       <template is="dom-if" if="[[configuration.properties.number.length]]">
         <div class="section numbers">
           <div class="type-header">Number properties</div>
-            <div class="list">
+          <div class="list">
             <template
-              is="dom-repeat"
-              items="{{configuration.properties.number}}"
-              filter="[[filterFn]]"
-            >
-              <paper-input type="number" label="[[_toHyphen(item.name)]]" value="{{item.value}}"></paper-input>
+                is="dom-repeat"
+                items="{{configuration.properties.number}}"
+                filter="[[filterFn]]">
+              <paper-input
+                  type="number"
+                  label="[[_toHyphen(item.name)]]"
+                  value="{{item.value}}">
+              </paper-input>
             </template>
           </div>
         </div>
@@ -140,12 +146,11 @@
       <template is="dom-if" if="[[configuration.methods.length]]">
         <div class="section methods">
           <div class="type-header">Methods</div>
-            <div class="list">
+          <div class="list">
             <template
-              is="dom-repeat"
-              items="{{configuration.methods}}"
-              filter="[[filterFn]]"
-            >
+                is="dom-repeat"
+                items="{{configuration.methods}}"
+                filter="[[filterFn]]">
               <paper-sandbox-method
                   name="[[item.name]]"
                   description="[[item.description]]"
@@ -163,13 +168,12 @@
     /**
      * 
      * 
-     * #appliesMixin 
      * @customElement
      * @polymer
      */
-    class SandboxConfiguration extends Polymer.Element {
+    class PaperSandboxConfiguration extends Polymer.Element {
 
-      static get is() { return 'sandbox-configuration'; }
+      static get is() { return 'paper-sandbox-configuration'; }
 
       static get properties() {
         return {
@@ -196,7 +200,6 @@
 
         Polymer.RenderStatus.afterNextRender(this, () => {
           const callback = ({[0]: entry}) => {
-            entry.target.classList.toggle('elevated', entry.isIntersecting);
           };
           const targets = this.shadowRoot.querySelectorAll('.section');
           for (let target of targets) {
@@ -231,7 +234,7 @@
       }
     }
 
-    window.customElements.define(SandboxConfiguration.is, SandboxConfiguration);
+    window.customElements.define(PaperSandboxConfiguration.is, PaperSandboxConfiguration);
 
   </script>
 </dom-module>
