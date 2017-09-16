@@ -2,7 +2,7 @@
 <link rel="import" href="../shadycss/apply-shim.html">
 <link rel="import" href="../polymer/lib/utils/templatize.html">
 <link rel="import" href="paper-sandbox-interaction.html">
-<link rel="import" href="mixins/sandbox-generator.html">
+<link rel="import" href="mixins/sandboxer.html">
 
 <dom-module id="paper-sandbox">
   <template>
@@ -44,10 +44,10 @@
      * 
      * @customElement
      * @polymer
-     * @appliesMixin Zecat.SandboxGenerator
+     * @appliesMixin Zecat.Sandboxer
      * @demo demo/index.html
      */
-    class PaperSandbox extends Zecat.SandboxGenerator(Polymer.Element) {
+    class PaperSandbox extends Zecat.Sandboxer(Polymer.Element) {
 
       static get is() { return 'paper-sandbox'; }
 
