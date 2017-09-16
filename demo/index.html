@@ -23,11 +23,23 @@
   </style>
   <body>
 
+    <style>
+      #container {
+        padding: 42px;
+      }
+      paper-relative-integer-input {
+        max-width: 300px;
+        margin: auto;
+      }
+    </style>
+
     <paper-sandboxer tag="paper-relative-integer-input">
-      <paper-relative-integer-input
-          label="label"
-          placeholder="placeholder">
-      </paper-relative-integer-input>
+      <div id="container">
+        <paper-relative-integer-input
+            label="label"
+            placeholder="placeholder">
+        </paper-relative-integer-input>
+      </div>
     </paper-sandboxer>
 
   </body>
