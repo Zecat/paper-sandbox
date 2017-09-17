@@ -12,6 +12,11 @@
       :host {
         display: block;
         box-sizing: border-box;
+        @apply --shadow-transition;
+      }
+      :host([editing]), :host(:hover) {
+        background-color: white;
+        @apply --shadow-elevation-2dp;
       }
       #toolbar {
         height: 52px;
@@ -60,7 +65,13 @@
             notify: true
           },
           defaultValue: Object,
-          label: String
+          label: String,
+          editing: {
+            type: Boolean,
+            value: false,
+            readOnly: true,
+            reflectToAttribute: true
+          }
         };
       }
 
@@ -84,6 +95,12 @@
       _editorReadyHandler() {
         setTimeout(()=> {
           this.resetDefaultValue();
+          this.$.editor.editor.addEventListener('focus', () => {
+            this._setEditing(true);
+          });
+          this.$.editor.editor.addEventListener('blur', () => {
+            this._setEditing(false);
+          });
         }, 1);
       }
 
