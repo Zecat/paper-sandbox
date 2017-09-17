@@ -42,16 +42,26 @@
     parseAnalysis(analysis) {
       let descriptor = this.emptySandboxDescriptor;
 
-      for (let {type, name, description, privacy, metadata} of analysis.properties) {
-        // TODO: manage multi types
+      for (let {type, name, defaultValue, description, privacy, metadata} of analysis.properties) {
+        // Array and Object types are uppercase
+        type = type.toLowerCase();
         if (!descriptor.properties[type]) {
           descriptor.properties[type] = [];
         }
+        if (defaultValue !== undefined) {
+          try {
+            defaultValue = JSON.parse(defaultValue);
+          } catch(e) {
+            defaultValue = undefined;
+          }
+        }
+        // v.observer.substring(1, v.observer.length - 1);
         let propertyDescriptor = {
           name,
           description,
           privacy,
-          value: undefined
+          defaultValue,
+          value: defaultValue
         };
         if (metadata.polymer && Object.keys(metadata.polymer).length) {
           // assign any polymer metadata (notify, readOnly...)
