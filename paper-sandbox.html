@@ -10,7 +10,7 @@
 <link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="paper-sandbox-method.html">
 <link rel="import" href="paper-sandbox-object.html">
-<link rel="import" href="mixins/sandboxer.html">
+<link rel="import" href="mixins/sandbox.html">
 
 <dom-module id="paper-sandbox">
   <template strip-whitespace>
@@ -211,9 +211,9 @@
      * 
      * @customElement
      * @polymer
-     * @apply Zecat.Sandboxer
+     * @apply Zecat.Sandbox
      */
-    class PaperSandbox extends Zecat.Sandboxer(Polymer.Element) {
+    class PaperSandbox extends Zecat.Sandbox(Polymer.Element) {
 
       static get is() { return 'paper-sandbox'; }
 

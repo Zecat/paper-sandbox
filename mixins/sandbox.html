@@ -16,7 +16,7 @@
    * @appliesMixin Zecat.ParseAnalysis
    * @appliesMixin Zecat.FetchAnalysis
    */
-  Zecat.Sandboxer = superClass => class extends
+  Zecat.Sandbox = superClass => class extends
     Zecat.BindElementToDescriptor(Zecat.ParseAnalysis(Zecat.FetchAnalysis(superClass))) {
 
     static get properties() {
