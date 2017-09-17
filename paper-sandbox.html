@@ -8,8 +8,6 @@
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-styles/typography.html">
 <link rel="import" href="../paper-styles/shadow.html">
-<link rel="import" href="../prism-element/prism-highlighter.html">
-<link rel="import" href="../marked-element/marked-element.html">
 <link rel="import" href="paper-sandbox-method.html">
 <link rel="import" href="paper-sandbox-object.html">
 <link rel="import" href="mixins/sandboxer.html">
@@ -95,6 +93,7 @@
       }
       paper-sandbox-object {
         margin: 16px;
+        z-index: 0;
       }
       paper-sandbox-object:hover {
         background: white;
@@ -155,8 +154,6 @@
         </div>
       </template>
 
-      <prism-highlighter id="prismHighlighter"></prism-highlighter>
-      
       <template is="dom-if" if="[[descriptor.properties.object.length]]">
         <div class="section object">
           <div class="type-header">Object properties</div>
@@ -166,7 +163,25 @@
                 filter="[[filterFn]]">
               <paper-sandbox-object
                   label="[[_toHyphenate(item.name)]]"
-                  value="[[item.value]]">
+                  default-value="[[item.defaultValue]]"
+                  value="{{item.value}}">
+              </paper-sandbox-object>
+            </template>
+          </div>
+        </div>
+      </template>
+
+      <template is="dom-if" if="[[descriptor.properties.object.length]]">
+        <div class="section array">
+          <div class="type-header">Array properties</div>
+          <div class="list">
+            <template is="dom-repeat"
+                items="{{descriptor.properties.array}}"
+                filter="[[filterFn]]">
+              <paper-sandbox-object
+                  label="[[_toHyphenate(item.name)]]"
+                  default-value="[[item.defaultValue]]"
+                  value="{{item.value}}">
               </paper-sandbox-object>
             </template>
           </div>

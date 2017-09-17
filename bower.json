@@ -39,7 +39,8 @@
     "paper-fab": "PolymerElements/paper-fab#^2.0.0",
     "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^2.1.0",
     "prism-element": "PolymerElements/prism-element#^2.0.1",
-    "marked-element": "PolymerElements/marked-element#^2.3.0"
+    "marked-element": "PolymerElements/marked-element#^2.3.0",
+    "juicy-ace-editor": "Juicy/juicy-ace-editor#^2.0.4"
   },
   "devDependencies": {
     "paper-input": "PolymerElements/paper-input#2.0.0",
