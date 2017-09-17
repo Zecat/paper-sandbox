@@ -26,17 +26,30 @@
     }
 
     get emptySandboxDescriptor() {
-      return {
-        properties: {
-          boolean: [],
-          string: [],
-          number: [],
-          object: [],
-          function: []
-        },
+      let descriptor = {
+        properties: {},
+        count: {},
         events: [],
         methods: []
       };
+      let propertyTypes = [
+        'boolean',
+        'string',
+        'number',
+        'array',
+        'object',
+        'function',
+        'generic'
+      ];
+
+      for (let type of propertyTypes) {
+        descriptor.properties[type] = [];
+        descriptor.count[type] = {
+          public: 0,
+          total: 0
+        };
+      }
+      return descriptor;
     }
 
     parseAnalysis(analysis) {
@@ -46,8 +59,13 @@
         // Array and Object types are uppercase
         type = type.toLowerCase();
         if (!descriptor.properties[type]) {
-          descriptor.properties[type] = [];
+          type = 'generic';
         }
+
+        descriptor.count[type].total++;
+        if (privacy === 'public') descriptor.count[type].public++;
+
+
         if (defaultValue !== undefined) {
           try {
             defaultValue = JSON.parse(defaultValue);
