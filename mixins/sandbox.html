@@ -37,23 +37,8 @@
     async _analyzedElementChanged(analyzedElement) {
       if (!analyzedElement) return;
       
-      try {
-        this.descriptor = this.parseAnalysis(
+      this.descriptor = this.parseAnalysis(
           await this.fetchAnalysisForElement(this.analyzedElement));
-      } 
-      catch (err) {
-        // TODO: get ride of this warn
-        console.warn(err);
-        this.analysisErrorCode = err.code;
-        this.dispatchEvent(
-          new CustomEvent(
-            'analysis-error',
-            {
-              detail: err,
-              bubbles: true,
-              composed: true
-            }));
-      }
     }
   };
 })();

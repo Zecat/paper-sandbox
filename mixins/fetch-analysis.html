@@ -12,6 +12,11 @@
    */
   Zecat.FetchAnalysis = superClass => class extends superClass {
 
+    /**
+    * @event analysis-error Fired when the analysis file could no be parse or
+    *                       fetch.
+    */
+
     static get properties() {
       return {
         fetchingAnalysis: {
@@ -41,15 +46,25 @@
       };
     }
 
-    twrowAnalysisError(code) {
-      throw new Error({code, description: this.analysisErrors[code]});
+    notifyAnalysisError(code) {
+      this.dispatchEvent(
+          new CustomEvent(
+            'analysis-error',
+            {
+              detail: {
+                code,
+                description: this.analysisErrors[code]
+              },
+              bubbles: true,
+              composed: true
+            }));
     }
 
     async fetchAnalysisForElement(el, analysisPath) {
-      if (!el) this.twrowAnalysisError(0);
+      if (!el) this.notifyAnalysisError(0);
       // TODO: The custom element check could be improved following this example:
       // https://developers.google.com/web/fundamentals/architecture/building-components/shadowdom#findall
-      if (el.nodeType != Node.ELEMENT_NODE) this.twrowAnalysisError(1);
+      if (el.nodeType != Node.ELEMENT_NODE) this.notifyAnalysisError(1);
       
       if (!analysisPath) {
         analysisPath = `${el.importPath}analysis.json`;
@@ -63,18 +78,18 @@
         this._setFetchingAnalysis(false);
       } catch (err) {
         this._setFetchingAnalysis(false);
-        this.twrowAnalysisError(2);
+        this.notifyAnalysisError(2);
       }
 
-      if (!fetchAnalysis.ok) this.twrowAnalysisError(3);
+      if (!fetchAnalysis.ok) this.notifyAnalysisError(3);
 
       const {elements} = await fetchAnalysis.json();
-      if (!elements || !(elements instanceof Array)) this.twrowAnalysisError(4);
+      if (!elements || !(elements instanceof Array)) this.notifyAnalysisError(4);
 
       const tagName = el.nodeName.toLowerCase();
       const configForEl = elements.find(elConfig => elConfig.tagname === tagName);
 
-      if (!configForEl) this.twrowAnalysisError(5);
+      if (!configForEl) this.notifyAnalysisError(5);
 
       return configForEl;
     }
