@@ -94,6 +94,8 @@
 
       _editorReadyHandler() {
         setTimeout(()=> {
+          // fix ace editor warning message
+          this.$.editor.editor.$blockScrolling = Infinity;
           this.resetDefaultValue();
           this.$.editor.editor.addEventListener('focus', this._handleEditorFocus.bind(this));
           this.$.editor.editor.addEventListener('blur', this._handleEditorBlur.bind(this));
