@@ -98,109 +98,110 @@
     </style>
 
     <paper-icon-button id="moreBtn" icon="more-vert"></paper-icon-button>
-      <template is="dom-if" if="[[descriptor.properties.boolean.length]]">
-        <div class="section booleans">
-          <div class="type-header">Boolean properties</div>
-          <div class="list">
-            <template
-                is="dom-repeat"
-                items="{{descriptor.properties.boolean}}"
-                filter="[[filterFn]]">
-              <paper-checkbox checked="{{item.value}}">
-                [[_toHyphenate(item.name)]]
-              </paper-checkbox>
-            </template>
-          </div>
-        </div>
-      </template>
 
-      <template is="dom-if" if="[[descriptor.properties.string.length]]">
-        <div class="section strings">
-          <div class="type-header">String properties</div>
-          <div class="list">
-            <template
-                is="dom-repeat"
-                items="{{descriptor.properties.string}}"
-                filter="[[filterFn]]">
-              <paper-input
-                  label="[[_toHyphenate(item.name)]]"
-                  value="{{item.value}}">
-              </paper-input>
-            </template>
-          </div>
+    <template is="dom-if" if="[[descriptor.properties.boolean.length]]">
+      <div class="section booleans">
+        <div class="type-header">Boolean properties</div>
+        <div class="list">
+          <template
+              is="dom-repeat"
+              items="{{descriptor.properties.boolean}}"
+              filter="[[filterFn]]">
+            <paper-checkbox checked="{{item.value}}">
+              [[_toHyphenate(item.name)]]
+            </paper-checkbox>
+          </template>
         </div>
-      </template>
+      </div>
+    </template>
 
-      <template is="dom-if" if="[[descriptor.properties.number.length]]">
-        <div class="section numbers">
-          <div class="type-header">Number properties</div>
-          <div class="list">
-            <template
-                is="dom-repeat"
-                items="{{descriptor.properties.number}}"
-                filter="[[filterFn]]">
-              <paper-input
-                  type="number"
-                  label="[[_toHyphenate(item.name)]]"
-                  value="{{item.value}}">
-              </paper-input>
-            </template>
-          </div>
+    <template is="dom-if" if="[[descriptor.properties.string.length]]">
+      <div class="section strings">
+        <div class="type-header">String properties</div>
+        <div class="list">
+          <template
+              is="dom-repeat"
+              items="{{descriptor.properties.string}}"
+              filter="[[filterFn]]">
+            <paper-input
+                label="[[_toHyphenate(item.name)]]"
+                value="{{item.value}}">
+            </paper-input>
+          </template>
         </div>
-      </template>
+      </div>
+    </template>
 
-      <template is="dom-if" if="[[descriptor.properties.object.length]]">
-        <div class="section object">
-          <div class="type-header">Object properties</div>
-          <div class="list">
-            <template is="dom-repeat"
-                items="{{descriptor.properties.object}}"
-                filter="[[filterFn]]">
-              <paper-sandbox-object
-                  label="[[_toHyphenate(item.name)]]"
-                  default-value="[[item.defaultValue]]"
-                  value="{{item.value}}">
-              </paper-sandbox-object>
-            </template>
-          </div>
+    <template is="dom-if" if="[[descriptor.properties.number.length]]">
+      <div class="section numbers">
+        <div class="type-header">Number properties</div>
+        <div class="list">
+          <template
+              is="dom-repeat"
+              items="{{descriptor.properties.number}}"
+              filter="[[filterFn]]">
+            <paper-input
+                type="number"
+                label="[[_toHyphenate(item.name)]]"
+                value="{{item.value}}">
+            </paper-input>
+          </template>
         </div>
-      </template>
+      </div>
+    </template>
 
-      <template is="dom-if" if="[[descriptor.properties.object.length]]">
-        <div class="section array">
-          <div class="type-header">Array properties</div>
-          <div class="list">
-            <template is="dom-repeat"
-                items="{{descriptor.properties.array}}"
-                filter="[[filterFn]]">
-              <paper-sandbox-object
-                  label="[[_toHyphenate(item.name)]]"
-                  default-value="[[item.defaultValue]]"
-                  value="{{item.value}}">
-              </paper-sandbox-object>
-            </template>
-          </div>
+    <template is="dom-if" if="[[descriptor.properties.object.length]]">
+      <div class="section object">
+        <div class="type-header">Object properties</div>
+        <div class="list">
+          <template is="dom-repeat"
+              items="{{descriptor.properties.object}}"
+              filter="[[filterFn]]">
+            <paper-sandbox-object
+                label="[[_toHyphenate(item.name)]]"
+                default-value="[[item.defaultValue]]"
+                value="{{item.value}}">
+            </paper-sandbox-object>
+          </template>
         </div>
-      </template>
-      
-      <template is="dom-if" if="[[descriptor.methods.length]]">
-        <div class="section methods">
-          <div class="type-header">Methods</div>
-          <div class="list">
-            <template
-                is="dom-repeat"
-                items="{{descriptor.methods}}"
-                filter="[[filterFn]]">
-              <paper-sandbox-method
-                  name="[[item.name]]"
-                  description="[[item.description]]"
-                  params="{{item.params}}"
-                  on-method-triggered="_methodTriggeredHandler">
-              </paper-sandbox-method>
-            </template>
-          </div>
+      </div>
+    </template>
+
+    <template is="dom-if" if="[[descriptor.properties.object.length]]">
+      <div class="section array">
+        <div class="type-header">Array properties</div>
+        <div class="list">
+          <template is="dom-repeat"
+              items="{{descriptor.properties.array}}"
+              filter="[[filterFn]]">
+            <paper-sandbox-object
+                label="[[_toHyphenate(item.name)]]"
+                default-value="[[item.defaultValue]]"
+                value="{{item.value}}">
+            </paper-sandbox-object>
+          </template>
         </div>
-      </template>
+      </div>
+    </template>
+    
+    <template is="dom-if" if="[[descriptor.methods.length]]">
+      <div class="section methods">
+        <div class="type-header">Methods</div>
+        <div class="list">
+          <template
+              is="dom-repeat"
+              items="{{descriptor.methods}}"
+              filter="[[filterFn]]">
+            <paper-sandbox-method
+                name="[[item.name]]"
+                description="[[item.description]]"
+                params="{{item.params}}"
+                on-method-triggered="_methodTriggeredHandler">
+            </paper-sandbox-method>
+          </template>
+        </div>
+      </div>
+    </template>
 
   </template>
 
