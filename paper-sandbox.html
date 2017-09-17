@@ -194,7 +194,6 @@
       </div>
     </template>
 
-
     <template
         is="dom-if"
         if="[[_hasPropertiesForPrivacy(descriptor.count.generic, showPrivate)]]">
@@ -243,7 +242,7 @@
      * 
      * @customElement
      * @polymer
-     * @apply Zecat.Sandbox
+     * @appliesMixin Zecat.Sandbox
      */
     class PaperSandbox extends Zecat.Sandbox(Polymer.Element) {
 
