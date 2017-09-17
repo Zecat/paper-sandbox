@@ -36,7 +36,6 @@
         fontsize="16"
         mode="ace/mode/json"
         theme="ace/theme/chrome"
-        on-change="_changeHandler"
         on-editor-ready="_editorReadyHandler">
     </juicy-ace-editor>
 
@@ -88,7 +87,8 @@
         }, 1);
       }
 
-      _changeHandler(e) {
+      getValidity() {
+        return this.$.editor.editor.session.getAnnotations().length === 0;
       }
     }
 
