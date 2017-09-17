@@ -8,7 +8,10 @@
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-styles/typography.html">
 <link rel="import" href="../paper-styles/shadow.html">
+<link rel="import" href="../prism-element/prism-highlighter.html">
+<link rel="import" href="../marked-element/marked-element.html">
 <link rel="import" href="paper-sandbox-method.html">
+<link rel="import" href="paper-sandbox-object.html">
 <link rel="import" href="mixins/sandboxer.html">
 
 <dom-module id="paper-sandbox">
@@ -90,6 +93,14 @@
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
       }
+      paper-sandbox-object {
+        margin: 16px;
+      }
+      paper-sandbox-object:hover {
+        background: white;
+        @apply --shadow-transition;
+        @apply --shadow-elevation-2dp;
+      }
     </style>
 
     <paper-icon-button id="moreBtn" icon="more-vert"></paper-icon-button>
@@ -144,6 +155,24 @@
         </div>
       </template>
 
+      <prism-highlighter id="prismHighlighter"></prism-highlighter>
+      
+      <template is="dom-if" if="[[descriptor.properties.object.length]]">
+        <div class="section object">
+          <div class="type-header">Object properties</div>
+          <div class="list">
+            <template is="dom-repeat"
+                items="{{descriptor.properties.object}}"
+                filter="[[filterFn]]">
+              <paper-sandbox-object
+                  label="[[_toHyphenate(item.name)]]"
+                  value="[[item.value]]">
+              </paper-sandbox-object>
+            </template>
+          </div>
+        </div>
+      </template>
+      
       <template is="dom-if" if="[[descriptor.methods.length]]">
         <div class="section methods">
           <div class="type-header">Methods</div>

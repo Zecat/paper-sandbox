@@ -37,7 +37,9 @@
     "iron-scroll-spy": "Zecat/iron-scroll-spy#2.0-preview",
     "app-layout": "PolymerElements/app-layout#^2.0.1",
     "paper-fab": "PolymerElements/paper-fab#^2.0.0",
-    "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^2.1.0"
+    "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^2.1.0",
+    "prism-element": "PolymerElements/prism-element#^2.0.1",
+    "marked-element": "PolymerElements/marked-element#^2.3.0"
   },
   "devDependencies": {
     "paper-input": "PolymerElements/paper-input#2.0.0",

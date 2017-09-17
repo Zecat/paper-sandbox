@@ -1,0 +1,75 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-styles/typography.html">
+<link rel="import" href="../paper-styles/shadow.html">
+<link rel="import" href="../marked-element/marked-element.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../prism-element/prism-theme-default.html">
+
+<dom-module id="paper-sandbox-object">
+  <template>
+    <style include="prism-theme-default">
+      :host {
+        display: block;
+        box-sizing: border-box;
+      }
+      #toolbar {
+        height: 52px;
+        border-bottom: 1px solid var(--paper-grey-200);
+        @apply --paper-font-common-base;
+        @apply --layout-horizontal;
+        @apply --layout-center;
+        @apply --layout-justified;
+        padding: 0 12px;
+        color: var(--paper-grey-700);
+      }
+      marked-element {
+        padding: 12px;
+        background: white;
+      }
+    </style>
+    
+    <div id="toolbar">
+      <span>[[label]]</span>
+      <paper-icon-button icon="sandbox:mode-edit"></paper-icon-button>
+    </div>
+    
+    <marked-element markdown="[[_computeJsonMarkdown(value)]]">
+      <div slot="markdown-html"></div>
+    </marked-element>
+
+  </template>
+
+  <script>
+    /**
+     * 
+     * 
+     * @customElement
+     * @polymer
+     * @apply Zecat.Sandboxer
+     */
+    class PaperSandboxObject extends Polymer.Element {
+
+      static get is() { return 'paper-sandbox-object'; }
+
+      static get properties() {
+        return {
+          value: Object,
+          label: String
+        };
+      }
+
+      constructor() {
+        super();
+      }
+
+      _computeJsonMarkdown(json) {
+        console.log(json, 'uu')
+        return '```json\n' + JSON.stringify(json, null, 2) + '\n' + '```';
+      }
+    }
+
+    window.customElements.define(PaperSandboxObject.is, PaperSandboxObject);
+
+  </script>
+</dom-module>
