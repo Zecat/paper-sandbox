@@ -37,7 +37,7 @@
     </div>
 
     <juicy-ace-editor
-        id="editor"
+        id="juicyAceEditor"
         fontsize="16"
         mode="ace/mode/json"
         theme="ace/theme/chrome"
@@ -85,7 +85,7 @@
 
       updateEditorValueFromObject(object) {
         // Update the value and position the cursor at the first line
-        this.$.editor.editor.setValue(this._prettyStringify(object), 1);
+        this.$.juicyAceEditor.editor.setValue(this._prettyStringify(object), 1);
       }
 
       resetDefaultValue() {
@@ -95,10 +95,10 @@
       _editorReadyHandler() {
         setTimeout(()=> {
           // fix ace editor warning message
-          this.$.editor.editor.$blockScrolling = Infinity;
+          this.$.juicyAceEditor.editor.$blockScrolling = Infinity;
           this.resetDefaultValue();
-          this.$.editor.editor.addEventListener('focus', this._handleEditorFocus.bind(this));
-          this.$.editor.editor.addEventListener('blur', this._handleEditorBlur.bind(this));
+          this.$.juicyAceEditor.editor.addEventListener('focus', this._handleEditorFocus.bind(this));
+          this.$.juicyAceEditor.editor.addEventListener('blur', this._handleEditorBlur.bind(this));
         }, 1);
       }
 
@@ -109,13 +109,13 @@
       _handleEditorBlur() {
         this._setEditing(false);
         if (this.validity) {
-          this.value = JSON.parse(this.$.editor.value);
+          this.value = JSON.parse(this.$.juicyAceEditor.value);
           this.updateEditorValueFromObject(this.value);
         }
       }
 
       get validity() {
-        return this.$.editor.editor.session.getAnnotations().length === 0;
+        return this.$.juicyAceEditor.editor.session.getAnnotations().length === 0;
       }
     }
 
