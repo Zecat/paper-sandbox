@@ -109,7 +109,13 @@
       _handleEditorBlur() {
         this._setEditing(false);
         if (this.validity) {
-          this.value = JSON.parse(this.$.juicyAceEditor.value);
+          try {
+            // attempt to parse the edited json
+            this.value = JSON.parse(this.$.juicyAceEditor.value);
+          }
+          catch(err) {
+            this.value = undefined;
+          }
           this.updateEditorValueFromObject(this.value);
         }
       }
