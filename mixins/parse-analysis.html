@@ -56,15 +56,23 @@
       let descriptor = this.emptySandboxDescriptor;
 
       for (let {type, name, defaultValue, description, privacy, metadata} of analysis.properties) {
+        let propertyDescriptor = {};
+        
         // Array and Object types are uppercase
         type = type.toLowerCase();
+        
+        // if the property type is not managed
         if (!descriptor.properties[type]) {
+          // store the type in the property descriptor
+          propertyDescriptor.type = type;
+          // assign it to the generic group
           type = 'generic';
         }
 
         descriptor.count[type].total++;
-        if (privacy === 'public') descriptor.count[type].public++;
-
+        if (privacy === 'public') {
+          descriptor.count[type].public++;
+        }
 
         if (defaultValue !== undefined) {
           try {
@@ -73,21 +81,23 @@
             defaultValue = undefined;
           }
         }
-        // v.observer.substring(1, v.observer.length - 1);
-        let propertyDescriptor = {
+        
+        propertyDescriptor = Object.assign(propertyDescriptor, {
           name,
           description,
           privacy,
           defaultValue,
           value: defaultValue
-        };
+        });
+
         if (metadata.polymer && Object.keys(metadata.polymer).length) {
-          // assign any polymer metadata (notify, readOnly...)
+          // assign any polymer metadata (e.g. notify, readOnly...)
           propertyDescriptor = Object.assign(propertyDescriptor, metadata.polymer);
         }
         descriptor.properties[type].push(propertyDescriptor);
       }
       for (let {name, description, params, privacy} of analysis.methods) {
+
         descriptor.methods.push({
           name,
           description,
