@@ -99,7 +99,9 @@
 
     <paper-icon-button id="moreBtn" icon="more-vert"></paper-icon-button>
 
-    <template is="dom-if" if="[[descriptor.properties.boolean.length]]">
+    <template
+        is="dom-if"
+        if="[[_hasPropertiesForPrivacy(descriptor.count.boolean, showPrivate)]]">
       <div class="section booleans">
         <div class="type-header">Boolean properties</div>
         <div class="list">
@@ -115,7 +117,9 @@
       </div>
     </template>
 
-    <template is="dom-if" if="[[descriptor.properties.string.length]]">
+    <template
+        is="dom-if"
+        if="[[_hasPropertiesForPrivacy(descriptor.count.string, showPrivate)]]">
       <div class="section strings">
         <div class="type-header">String properties</div>
         <div class="list">
@@ -132,7 +136,9 @@
       </div>
     </template>
 
-    <template is="dom-if" if="[[descriptor.properties.number.length]]">
+    <template
+        is="dom-if"
+        if="[[_hasPropertiesForPrivacy(descriptor.count.number, showPrivate)]]">
       <div class="section numbers">
         <div class="type-header">Number properties</div>
         <div class="list">
@@ -150,7 +156,9 @@
       </div>
     </template>
 
-    <template is="dom-if" if="[[descriptor.properties.object.length]]">
+    <template
+        is="dom-if"
+        if="[[_hasPropertiesForPrivacy(descriptor.count.object, showPrivate)]]">
       <div class="section object">
         <div class="type-header">Object properties</div>
         <div class="list">
@@ -167,7 +175,9 @@
       </div>
     </template>
 
-    <template is="dom-if" if="[[descriptor.properties.object.length]]">
+    <template
+        is="dom-if"
+        if="[[_hasPropertiesForPrivacy(descriptor.count.array, showPrivate)]]">
       <div class="section array">
         <div class="type-header">Array properties</div>
         <div class="list">
@@ -183,8 +193,30 @@
         </div>
       </div>
     </template>
+
+
+    <template
+        is="dom-if"
+        if="[[_hasPropertiesForPrivacy(descriptor.count.generic, showPrivate)]]">
+      <div class="section generic">
+        <div class="type-header">Generic properties</div>
+        <div class="list">
+          <template is="dom-repeat"
+              items="{{descriptor.properties.generic}}"
+              filter="[[filterFn]]">
+            <paper-sandbox-object
+                label="[[_toHyphenate(item.name)]]"
+                default-value="[[item.defaultValue]]"
+                value="{{item.value}}">
+            </paper-sandbox-object>
+          </template>
+        </div>
+      </div>
+    </template>
     
-    <template is="dom-if" if="[[descriptor.methods.length]]">
+    <template
+        is="dom-if"
+        if="[[descriptor.methods.length]]">
       <div class="section methods">
         <div class="type-header">Methods</div>
         <div class="list">
@@ -245,6 +277,11 @@
             ).observe(toolbar);
           }
         });
+      }
+
+      _hasPropertiesForPrivacy(count, showPrivate) {
+        if (count == undefined || showPrivate == undefined) return;
+        return !!(showPrivate ? count.total : count.public);
       }
 
       _stopEventPropagation(e) {console.log(e);
