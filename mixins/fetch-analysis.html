@@ -67,6 +67,8 @@
       if (el.nodeType != Node.ELEMENT_NODE) this.notifyAnalysisError(1);
       
       if (!analysisPath) {
+        // wait for the element to be defined in order to access its import path
+        await customElements.whenDefined(el.localName);
         analysisPath = `${el.importPath}analysis.json`;
       }
 
