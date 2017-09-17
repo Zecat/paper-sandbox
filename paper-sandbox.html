@@ -261,7 +261,7 @@
       }
 
       _computeFilterFn(showPrivate) {
-        return item => showPrivate || item.privacy != 'protected';
+        return item => showPrivate || item.privacy === 'public';
       }
 
       _methodTriggeredHandler(e) {
