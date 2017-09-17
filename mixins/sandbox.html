@@ -42,6 +42,8 @@
           await this.fetchAnalysisForElement(this.analyzedElement));
       } 
       catch (err) {
+        // TODO: get ride of this warn
+        console.warn(err);
         this.analysisErrorCode = err.code;
         this.dispatchEvent(
           new CustomEvent(
