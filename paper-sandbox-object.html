@@ -95,16 +95,24 @@
       _editorReadyHandler() {
         setTimeout(()=> {
           this.resetDefaultValue();
-          this.$.editor.editor.addEventListener('focus', () => {
-            this._setEditing(true);
-          });
-          this.$.editor.editor.addEventListener('blur', () => {
-            this._setEditing(false);
-          });
+          this.$.editor.editor.addEventListener('focus', this._handleEditorFocus.bind(this));
+          this.$.editor.editor.addEventListener('blur', this._handleEditorBlur.bind(this));
         }, 1);
       }
 
-      getValidity() {
+      _handleEditorFocus() {
+        this._setEditing(true);
+      }
+     
+      _handleEditorBlur() {
+        this._setEditing(false);
+        if (this.validity) {
+          this.value = JSON.parse(this.$.editor.value);
+          this.updateEditorValueFromObject(this.value);
+        }
+      }
+
+      get validity() {
         return this.$.editor.editor.session.getAnnotations().length === 0;
       }
     }
