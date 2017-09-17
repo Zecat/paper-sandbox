@@ -83,22 +83,34 @@
         return object == undefined ? '' : JSON.stringify(object, null, 2);
       }
 
-      updateEditorValueFromObject(object) {
+      updateJsonFromObject(object) {
         // Update the value and position the cursor at the first line
         this.$.juicyAceEditor.editor.setValue(this._prettyStringify(object), 1);
+        this._prettyStringifiedValue = this.$.juicyAceEditor.value; 
       }
 
       resetDefaultValue() {
-        this.updateEditorValueFromObject(this.defaultValue);
+        this.value = this.defaultValue;
       }
 
       _editorReadyHandler() {
         setTimeout(()=> {
           // fix ace editor warning message
           this.$.juicyAceEditor.editor.$blockScrolling = Infinity;
-          this.resetDefaultValue();
-          this.$.juicyAceEditor.editor.addEventListener('focus', this._handleEditorFocus.bind(this));
-          this.$.juicyAceEditor.editor.addEventListener('blur', this._handleEditorBlur.bind(this));
+          // trigger '_handleEditorFocus' when the editor is focused
+          this.$.juicyAceEditor.editor.addEventListener(
+            'focus', this._handleEditorFocus.bind(this));
+          // trigger '_handleEditorBlur' when the editor is blured
+          this.$.juicyAceEditor.editor.addEventListener(
+            'blur', this._handleEditorBlur.bind(this));
+
+          this.updateJsonFromObject(this.value);
+
+          this._valueObjectChanged = changeRecord => {
+            if (changeRecord === undefined) return;
+            this.updateJsonFromObject(this.value);
+          };
+          this._createMethodObserver('_valueObjectChanged(value.*)', true);
         }, 1);
       }
 
@@ -108,15 +120,16 @@
      
       _handleEditorBlur() {
         this._setEditing(false);
-        if (this.validity) {
+        // if json has changed and is valid
+        if (this.validity && this._prettyStringifiedValue !== this.$.juicyAceEditor.value) {
+          // Note: update the value triggers the observer which updates the json
           try {
-            // attempt to parse the edited json
+            // attempt to parse the edited json: fails when json is empty
             this.value = JSON.parse(this.$.juicyAceEditor.value);
           }
           catch(err) {
             this.value = undefined;
           }
-          this.updateEditorValueFromObject(this.value);
         }
       }
 
