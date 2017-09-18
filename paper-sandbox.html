@@ -269,18 +269,35 @@
 
       constructor() {
         super();
+        this._setUpDynamicShadows();
+      }
 
-        Polymer.RenderStatus.afterNextRender(this, () => {
-          const callback = ({[0]: entry}) => {
-            entry.target.classList.toggle('elevated', entry.isIntersecting);
-          };
-          const targets = this.shadowRoot.querySelectorAll('.section');
-          for (let target of targets) {
-            const toolbar = target.querySelector('.type-header');
-            (new IntersectionObserver(
-              callback, {root: target, rootMargin: `-${toolbar.clientHeight+2}px 0px 0px 0px`})
-            ).observe(toolbar);
+      _setUpDynamicShadows() {
+        const callback = ({[0]: entry}) => {
+          entry.target.classList.toggle('elevated', entry.isIntersecting);
+        };
+
+        this.addEventListener('dom-change', (e) => {
+          const rootTarget = event.composedPath()[0];
+          
+          if (rootTarget.parentNode !== this.shadowRoot
+              || rootTarget.localName !== 'dom-if') {
+            return;
           }
+          // Here, the dom-change event has been dispatched
+          // by a dom-if in the shadow root of this element
+
+          // TODO: ensure an intersectionObserver doesn't already exist for
+          // this section
+
+          const section = rootTarget.previousElementSibling;
+          const toolbar = section.querySelector('.type-header');
+          const options = {
+              root: section,
+              rootMargin: `-${toolbar.clientHeight+2}px 0px 0px 0px`
+          };
+          const observer = new IntersectionObserver(callback, options);
+          observer.observe(toolbar);
         });
       }
 
