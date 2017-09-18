@@ -241,7 +241,7 @@
     
     <template
         is="dom-if"
-        if="[[descriptor.methods.length]]">
+        if="[[descriptor.count.nonInheritedMethods]]">
       <div class="section methods">
         <div class="type-header">Methods</div>
         <div class="list">
@@ -280,9 +280,13 @@
             type: Boolean,
             value: false
           },
+          showInherited: {
+            type: Boolean,
+            value: false
+          },
           filterFn: {
             type: Function,
-            computed: '_computeFilterFn(showPrivate)'
+            computed: '_computeFilterFn(showPrivate, showInherited)'
           }
         };
       }
@@ -339,8 +343,9 @@
         return value.replace( /([A-Z])/g, "-$1" ).toLowerCase();
       }
 
-      _computeFilterFn(showPrivate) {
-        return item => showPrivate || item.privacy === 'public';
+      _computeFilterFn(showPrivate, showInherited) {
+        return item => (showPrivate || item.privacy === 'public') &&
+                       (showInherited || item.inheritedFrom === undefined);
       }
 
       _methodTriggeredHandler(e) {

@@ -41,7 +41,9 @@
     get emptySandboxDescriptor() {
       let descriptor = {
         properties: {},
-        count: {},
+        count: {
+          nonInheritedMethods: 0
+        },
         events: [],
         methods: []
       };
@@ -100,13 +102,19 @@
         }
         descriptor.properties[group].push(propertyDescriptor);
       }
-      for (let {name, description, params, privacy} of analysis.methods) {
+      
+
+      for (let {name, description, params, privacy, inheritedFrom} of analysis.methods) {
+        if (inheritedFrom === undefined) {
+          descriptor.count.nonInheritedMethods++;
+        }
 
         descriptor.methods.push({
           name,
           description,
           params: params.map(p => Object.assign(p, {value: undefined})),
-          privacy
+          privacy,
+          inheritedFrom
         });
       }
       for (let {name, description} of analysis.events) {
@@ -119,6 +127,5 @@
 
   };
 })();
-  
 
 </script>
