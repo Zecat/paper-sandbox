@@ -164,6 +164,26 @@
 
     <template
         is="dom-if"
+        if="[[_hasPropertiesForPrivacy(descriptor.count.date, showPrivate)]]">
+      <div class="section dates">
+        <div class="type-header">Date properties</div>
+        <div class="list">
+          <template
+              is="dom-repeat"
+              items="{{descriptor.properties.date}}"
+              filter="[[filterFn]]">
+            <paper-input
+                type="date"
+                label="[[_toHyphenate(item.name)]]"
+                value="{{item.value}}">
+            </paper-input>
+          </template>
+        </div>
+      </div>
+    </template>
+
+    <template
+        is="dom-if"
         if="[[_hasPropertiesForPrivacy(descriptor.count.object, showPrivate)]]">
       <div class="section object">
         <div class="type-header">Object properties</div>
