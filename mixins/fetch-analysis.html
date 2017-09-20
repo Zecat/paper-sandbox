@@ -3,10 +3,10 @@
   'use strict';
 
   if (!window.Zecat) window.Zecat = {};
-  
+
   /**
-   * 
-   * 
+   *
+   *
    * @polymer
    * @mixinFunction
    */
@@ -61,11 +61,17 @@
     }
 
     async fetchAnalysisForElement(el, analysisPath) {
-      if (!el) this.notifyAnalysisError(0);
+      if (!el) {
+        this.notifyAnalysisError(0);
+        return;
+      }
       // TODO: The custom element check could be improved following this example:
       // https://developers.google.com/web/fundamentals/architecture/building-components/shadowdom#findall
-      if (el.nodeType != Node.ELEMENT_NODE) this.notifyAnalysisError(1);
-      
+      if (el.nodeType != Node.ELEMENT_NODE) {
+        this.notifyAnalysisError(1);
+        return;
+      }
+
       if (!analysisPath) {
         // wait for the element to be defined in order to access its import path
         await customElements.whenDefined(el.localName);
@@ -81,21 +87,31 @@
       } catch (err) {
         this._setFetchingAnalysis(false);
         this.notifyAnalysisError(2);
+        return;
       }
 
-      if (!fetchAnalysis.ok) this.notifyAnalysisError(3);
+      if (!fetchAnalysis.ok) {
+        this.notifyAnalysisError(3);
+        return;
+      }
 
       const {elements} = await fetchAnalysis.json();
-      if (!elements || !(elements instanceof Array)) this.notifyAnalysisError(4);
+      if (!elements || !(elements instanceof Array)) {
+        this.notifyAnalysisError(4);
+        return;
+      }
 
       const tagName = el.nodeName.toLowerCase();
       const configForEl = elements.find(elConfig => elConfig.tagname === tagName);
 
-      if (!configForEl) this.notifyAnalysisError(5);
+      if (!configForEl) {
+        this.notifyAnalysisError(5);
+        return;
+      }
 
       return configForEl;
     }
-    
+
   };
 })();
 </script>
