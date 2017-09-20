@@ -49,7 +49,7 @@
       super.disconnectedCallback();
     }
 
-    _updateDescriptorProperty(group, index, value) {
+    _setDescriptorProperty(group, index, value) {
       this.set(`descriptor.properties.${group}.${index}.value`, value);
     }
 
@@ -59,13 +59,13 @@
       for (let [group, properties] of Object.entries(descriptorProperties)) {
         properties.forEach(({name, notify = false}, i) => {
           // Copy the the initial value into the descriptor
-          this._updateDescriptorProperty(group, i, analyzedElement[name]);
+          this._setDescriptorProperty(group, i, analyzedElement[name]);
 
           if (!notify) return;
 
           const hyphenatedName = name.replace( /([A-Z])/g, "-$1" ).toLowerCase();
           const callback = e => {
-            this._updateDescriptorProperty(group, i, e.detail.value);
+            this._setDescriptorProperty(group, i, e.detail.value);
           };
           // Keep a reference to the callback for future event listener removal
           this._attributeChanged_boundListeners[name] = callback;
