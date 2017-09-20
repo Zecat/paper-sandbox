@@ -28,7 +28,7 @@
       .section {
         background: var(--paper-grey-50);
       }
-      .type-header {
+      .group-header {
         @apply --paper-font-subhead;
         position: sticky;
         top: 0;
@@ -40,7 +40,7 @@
         z-index: 1;
         @apply --shadow-transition;
       }
-      .type-header:before {
+      .group-header:before {
         display: block;
         content: '';
         height: 1px;
@@ -52,7 +52,7 @@
         left: 0;
         background: var(--paper-grey-200);
       }
-      .type-header.elevated {
+      .group-header.elevated {
         @apply --shadow-elevation-2dp;
       }
       .booleans {
@@ -109,7 +109,7 @@
         is="dom-if"
         if="[[_hasPropertiesForPrivacy(descriptor.count.boolean, showPrivate)]]">
       <div class="section booleans">
-        <div class="type-header">Boolean properties</div>
+        <div class="group-header">Boolean properties</div>
         <div class="list">
           <template
               is="dom-repeat"
@@ -127,7 +127,7 @@
         is="dom-if"
         if="[[_hasPropertiesForPrivacy(descriptor.count.string, showPrivate)]]">
       <div class="section strings">
-        <div class="type-header">String properties</div>
+        <div class="group-header">String properties</div>
         <div class="list">
           <template
               is="dom-repeat"
@@ -146,7 +146,7 @@
         is="dom-if"
         if="[[_hasPropertiesForPrivacy(descriptor.count.number, showPrivate)]]">
       <div class="section numbers">
-        <div class="type-header">Number properties</div>
+        <div class="group-header">Number properties</div>
         <div class="list">
           <template
               is="dom-repeat"
@@ -166,7 +166,7 @@
         is="dom-if"
         if="[[_hasPropertiesForPrivacy(descriptor.count.date, showPrivate)]]">
       <div class="section dates">
-        <div class="type-header">Date properties</div>
+        <div class="group-header">Date properties</div>
         <div class="list">
           <template
               is="dom-repeat"
@@ -186,7 +186,7 @@
         is="dom-if"
         if="[[_hasPropertiesForPrivacy(descriptor.count.object, showPrivate)]]">
       <div class="section object">
-        <div class="type-header">Object properties</div>
+        <div class="group-header">Object properties</div>
         <div class="list">
           <template is="dom-repeat"
               items="{{descriptor.properties.object}}"
@@ -205,7 +205,7 @@
         is="dom-if"
         if="[[_hasPropertiesForPrivacy(descriptor.count.array, showPrivate)]]">
       <div class="section array">
-        <div class="type-header">Array properties</div>
+        <div class="group-header">Array properties</div>
         <div class="list">
           <template is="dom-repeat"
               items="{{descriptor.properties.array}}"
@@ -224,7 +224,7 @@
         is="dom-if"
         if="[[_hasPropertiesForPrivacy(descriptor.count.generic, showPrivate)]]">
       <div class="section generic">
-        <div class="type-header">Generic properties</div>
+        <div class="group-header">Generic properties</div>
         <div class="list">
           <template is="dom-repeat"
               items="{{descriptor.properties.generic}}"
@@ -243,7 +243,7 @@
         is="dom-if"
         if="[[descriptor.count.nonInheritedMethods]]">
       <div class="section methods">
-        <div class="type-header">Methods</div>
+        <div class="group-header">Methods</div>
         <div class="list">
           <template
               is="dom-repeat"
@@ -315,7 +315,7 @@
           // this section
 
           const section = rootTarget.previousElementSibling;
-          const toolbar = section.querySelector('.type-header');
+          const toolbar = section.querySelector('.group-header');
           const options = {
               root: section,
               rootMargin: `-${toolbar.clientHeight+2}px 0px 0px 0px`

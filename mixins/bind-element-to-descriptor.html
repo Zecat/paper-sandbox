@@ -1,5 +1,5 @@
 <script>
-  
+
 (()=> {
   'use strict';
 
@@ -49,23 +49,23 @@
       super.disconnectedCallback();
     }
 
-    _updateDescriptorProperty(type, index, value) {
-      this.set(`descriptor.properties.${type}.${index}.value`, value);
+    _updateDescriptorProperty(group, index, value) {
+      this.set(`descriptor.properties.${group}.${index}.value`, value);
     }
 
     _bindElementAttributesToDescriptor(descriptorProperties, analyzedElement) {
       if (!descriptorProperties || !analyzedElement) return;
 
-      for (let [type, typedProperties] of Object.entries(descriptorProperties)) {
-        typedProperties.forEach(({name, notify = false}, i) => {
+      for (let [group, properties] of Object.entries(descriptorProperties)) {
+        properties.forEach(({name, notify = false}, i) => {
           // Copy the the initial value into the descriptor
-          this._updateDescriptorProperty(type, i, analyzedElement[name]);
+          this._updateDescriptorProperty(group, i, analyzedElement[name]);
 
           if (!notify) return;
-          
+
           const hyphenatedName = name.replace( /([A-Z])/g, "-$1" ).toLowerCase();
           const callback = e => {
-            this._updateDescriptorProperty(type, i, e.detail.value);
+            this._updateDescriptorProperty(group, i, e.detail.value);
           };
           // Keep a reference to the callback for future event listener removal
           this._attributeChanged_boundListeners[name] = callback;
@@ -77,16 +77,13 @@
     _updateElementAttribute(cr, element) {
       const nameSubpath = cr.path.indexOf('.value');
       if (nameSubpath >= 0) {
-        // const type = cr.path.split('.')[2];
         const itempath = cr.path.substring(0, nameSubpath);
         const item = this.get(itempath);
-        // const index = cr.base[type].indexOf(item);
         element[item.name] = item.value;
       }
     }
 
   };
 })();
-  
 
 </script>
