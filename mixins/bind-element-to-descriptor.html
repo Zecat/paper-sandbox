@@ -32,7 +32,7 @@
     static get observers() {
       return [
         '_updateElementAttribute(descriptor.properties.*, analyzedElement)',
-        '_bindElementAttributesToDescriptor(descriptor.properties)'
+        '_bindElementAttributesToDescriptor(descriptor.properties, analyzedElement)'
       ];
     }
 
@@ -49,19 +49,27 @@
       super.disconnectedCallback();
     }
 
-    _bindElementAttributesToDescriptor(descriptorProperties) {
-      if (!descriptorProperties) return;
+    _updateDescriptorProperty(type, index, value) {
+      this.set(`descriptor.properties.${type}.${index}.value`, value);
+    }
+
+    _bindElementAttributesToDescriptor(descriptorProperties, analyzedElement) {
+      if (!descriptorProperties || !analyzedElement) return;
 
       for (let [type, typedProperties] of Object.entries(descriptorProperties)) {
         typedProperties.forEach(({name, notify = false}, i) => {
+          // Copy the the initial value into the descriptor
+          this._updateDescriptorProperty(type, i, analyzedElement[name]);
+
           if (!notify) return;
+          
           const hyphenatedName = name.replace( /([A-Z])/g, "-$1" ).toLowerCase();
           const callback = e => {
-            this.set(`descriptor.properties.${type}.${i}.value`, e.detail.value);
+            this._updateDescriptorProperty(type, i, e.detail.value);
           };
           // Keep a reference to the callback for future event listener removal
           this._attributeChanged_boundListeners[name] = callback;
-          this.analyzedElement.addEventListener(`${hyphenatedName}-changed`, callback);
+          analyzedElement.addEventListener(`${hyphenatedName}-changed`, callback);
         });
       }
     }
