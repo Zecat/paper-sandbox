@@ -107,7 +107,7 @@
 
     <template
         is="dom-if"
-        if="[[_hasPropertiesForPrivacy(descriptor.count.boolean, showPrivate)]]">
+        if="[[_shoudDisplayProperty(descriptor.count.boolean, showPrivate, showInherited)]]">
       <div class="section booleans">
         <div class="group-header">Boolean properties</div>
         <div class="list">
@@ -125,7 +125,7 @@
 
     <template
         is="dom-if"
-        if="[[_hasPropertiesForPrivacy(descriptor.count.string, showPrivate)]]">
+        if="[[_shoudDisplayProperty(descriptor.count.string, showPrivate, showInherited)]]">
       <div class="section strings">
         <div class="group-header">String properties</div>
         <div class="list">
@@ -144,7 +144,7 @@
 
     <template
         is="dom-if"
-        if="[[_hasPropertiesForPrivacy(descriptor.count.number, showPrivate)]]">
+        if="[[_shoudDisplayProperty(descriptor.count.number, showPrivate, showInherited)]]">
       <div class="section numbers">
         <div class="group-header">Number properties</div>
         <div class="list">
@@ -164,7 +164,7 @@
 
     <template
         is="dom-if"
-        if="[[_hasPropertiesForPrivacy(descriptor.count.date, showPrivate)]]">
+        if="[[_shoudDisplayProperty(descriptor.count.date, showPrivate, showInherited)]]">
       <div class="section dates">
         <div class="group-header">Date properties</div>
         <div class="list">
@@ -184,7 +184,7 @@
 
     <template
         is="dom-if"
-        if="[[_hasPropertiesForPrivacy(descriptor.count.object, showPrivate)]]">
+        if="[[_shoudDisplayProperty(descriptor.count.object, showPrivate, showInherited)]]">
       <div class="section object">
         <div class="group-header">Object properties</div>
         <div class="list">
@@ -203,7 +203,7 @@
 
     <template
         is="dom-if"
-        if="[[_hasPropertiesForPrivacy(descriptor.count.array, showPrivate)]]">
+        if="[[_shoudDisplayProperty(descriptor.count.array, showPrivate, showInherited)]]">
       <div class="section array">
         <div class="group-header">Array properties</div>
         <div class="list">
@@ -222,7 +222,7 @@
 
     <template
         is="dom-if"
-        if="[[_hasPropertiesForPrivacy(descriptor.count.generic, showPrivate)]]">
+        if="[[_shoudDisplayProperty(descriptor.count.generic, showPrivate, showInherited)]]">
       <div class="section generic">
         <div class="group-header">Generic properties</div>
         <div class="list">
@@ -238,7 +238,7 @@
         </div>
       </div>
     </template>
-    
+
     <template
         is="dom-if"
         if="[[descriptor.count.nonInheritedMethods]]">
@@ -264,8 +264,8 @@
 
   <script>
     /**
-     * 
-     * 
+     *
+     *
      * @customElement
      * @polymer
      * @appliesMixin Zecat.Sandbox
@@ -303,7 +303,7 @@
 
         this.addEventListener('dom-change', (e) => {
           const rootTarget = event.composedPath()[0];
-          
+
           if (rootTarget.parentNode !== this.shadowRoot
               || rootTarget.localName !== 'dom-if') {
             return;
@@ -325,9 +325,12 @@
         });
       }
 
-      _hasPropertiesForPrivacy(count, showPrivate) {
-        if (count == undefined || showPrivate == undefined) return;
-        return !!(showPrivate ? count.total : count.public);
+      _shoudDisplayProperty(count, showPrivate, showInherited) {
+        if (count == undefined || showPrivate == undefined || showInherited == undefined) return;
+
+        return showPrivate ?
+                (showInherited ? count.total : count.notInherited) :
+                (showInherited ? count.publicInherited : count.publicNotInherited);
       }
 
       _stopEventPropagation(e) {console.log(e);

@@ -1,13 +1,13 @@
 <script>
-  
+
 (()=> {
   'use strict';
 
   if (!window.Zecat) window.Zecat = {};
 
   /**
-   * 
-   * 
+   *
+   *
    * @polymer
    * @mixinFunction
    */
@@ -52,7 +52,10 @@
         descriptor.properties[type] = [];
         descriptor.count[type] = {
           public: 0,
-          total: 0
+          total: 0,
+          notInherited: 0,
+          publicNotInherited: 0,
+          publicInherited: 0
         };
       }
       return descriptor;
@@ -64,26 +67,27 @@
       this._updateDescriptorProperties(descriptor, analysis.properties);
       this._updateDescriptorMethods(descriptor, analysis.methods);
       this._updateDescriptorEvents(descriptor, analysis.events);
- 
+
       Object.assign(descriptor, {styling: analysis.styling, slots: analysis.slots, tagname: analysis.tagname});
-      
+
       return descriptor;
     }
 
     _updateDescriptorProperties(descriptor, analysisProperties) {
       for (let property of analysisProperties) {
-        let { 
+        let {
           type,
           name,
           defaultValue,
           description,
           privacy,
-          metadata
-        } = property;  
+          metadata,
+          inheritedFrom
+        } = property;
         // Array and Object types are uppercase, we want lowercase
         let group = type.toLowerCase();
         let propertyDescriptor = {};
-        
+
         // if the property type is not managed
         if (!this.groups.includes(group)) {
           // store the type in the property descriptor
@@ -92,11 +96,21 @@
           group = 'generic';
         }
 
-        if (privacy === 'public') {
-          descriptor.count[group].public++;
+        let count = descriptor.count[group];
+
+        count.total++;
+
+        const isPublic = privacy === 'public';
+        const isNotInherited = inheritedFrom === undefined;
+
+        if (isNotInherited) {
+          count.notInherited++;
+          if (isPublic) {
+            count.publicNotInherited++;
+          }
+        } else if (isPublic) {
+          count.publicInherited++;
         }
-        // TODO: get ride of the total count
-        descriptor.count[group].total++;
 
         if (defaultValue !== undefined) {
           try {
@@ -110,6 +124,7 @@
           name,
           description,
           privacy,
+          inheritedFrom,
           defaultValue,
           value: defaultValue
         });
