@@ -62,6 +62,8 @@
     }
 
     parseAnalysis(analysis) {
+      if (analysis === undefined) return;
+      
       let descriptor = this.emptySandboxDescriptor;
 
       this._updateDescriptorProperties(descriptor, analysis.properties);
