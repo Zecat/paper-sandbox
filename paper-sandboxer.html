@@ -26,14 +26,12 @@
         overflow: auto;
         height: 100%;
       }
-      paper-fab   {
+      paper-fab {
+        z-index: 1;
         position: fixed;
         bottom: 24px;
         right: 24px;
         @apply --shadow-transition;
-      }
-      app-drawer-layout:not([narrow]) [drawer-toggle] {
-        display: none;
       }
       #errorToast {
         --paper-toast-background-color: var(--paper-red-500);
@@ -42,14 +40,24 @@
     </style>
 
     <paper-toast id="errorToast"></paper-toast>
+    
+    <template is="dom-if" if="[[narrow]]">
+      <paper-fab
+        icon="[[_computeFabIcon(drawerOpened)]]"
+        on-tap="toggleDrawer">
+      </paper-fab>
+    </template>
 
-    <app-drawer-layout responsive-width="1100px">
-      <app-drawer slot="drawer" swipe-open>
+    <app-drawer-layout
+        responsive-width="1100px"
+        narrow="{{narrow}}">
+      <app-drawer id="drawer" slot="drawer"
+          swipe-open
+          opened="{{drawerOpened}}">
         <paper-sandbox id="sandbox"></paper-sandbox>
       </app-drawer>
       <div>
         <slot id="slot" on-slotchange="_slotChangeHandler"></slot>
-        <paper-fab drawer-toggle icon="sandbox:experiment"></paper-fab>
       </div>
     </app-drawer-layout>
 
@@ -74,7 +82,9 @@
            * The tag name of the element you want to produce a sandbox for.
            * @type {String}
            */
-          tag: String
+          tag: String,
+          drawerOpened: Boolean,
+          narrow: Boolean
         };
       }
 
@@ -94,6 +104,14 @@
 
       _slotChangeHandler() {
         this.$.sandbox.analyzedElement = this.querySelector(this.tag);
+      }
+
+      toggleDrawer() {
+        this.$.drawer.toggle();
+      }
+
+      _computeFabIcon(drawerOpened) {
+        return drawerOpened ? 'sandbox:auto-fix' : 'sandbox:experiment';
       }
 
     }
