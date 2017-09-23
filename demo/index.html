@@ -7,7 +7,7 @@
     <title>paper-sandbox demo</title>
 
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-    <link rel="import" href="../../paper-relative-integer-input/paper-relative-integer-input.html">
+    <link rel="import" href="../../paper-number-input/paper-number-input.html">
     <link rel="import" href="../paper-sandboxer.html">
   </head>
 
@@ -24,18 +24,15 @@
       #wrapper {
         padding: 42px;
       }
-      paper-relative-integer-input {
+      paper-number-input {
         max-width: 300px;
         margin: auto;
       }
     </style>
 
-    <paper-sandboxer tag="paper-relative-integer-input">
+    <paper-sandboxer tag="paper-number-input">
       <div id="wrapper">
-        <paper-relative-integer-input
-            label="label"
-            placeholder="placeholder">
-        </paper-relative-integer-input>
+        <paper-number-input></paper-number-input>
       </div>
     </paper-sandboxer>
 

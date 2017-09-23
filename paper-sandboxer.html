@@ -41,19 +41,19 @@
 
     <paper-toast id="errorToast"></paper-toast>
     
-    <template is="dom-if" if="[[narrow]]">
+    <template is="dom-if" if="[[_narrow]]">
       <paper-fab
-        icon="[[_computeFabIcon(drawerOpened)]]"
+        icon="[[_computeFabIcon(_drawerOpened)]]"
         on-tap="toggleDrawer">
       </paper-fab>
     </template>
 
     <app-drawer-layout
         responsive-width="1100px"
-        narrow="{{narrow}}">
+        narrow="{{_narrow}}">
       <app-drawer id="drawer" slot="drawer"
           swipe-open
-          opened="{{drawerOpened}}">
+          opened="{{_drawerOpened}}">
         <paper-sandbox id="sandbox"></paper-sandbox>
       </app-drawer>
       <div>
@@ -83,8 +83,8 @@
            * @type {String}
            */
           tag: String,
-          drawerOpened: Boolean,
-          narrow: Boolean
+          _drawerOpened: Boolean,
+          _narrow: Boolean
         };
       }
 
@@ -110,8 +110,8 @@
         this.$.drawer.toggle();
       }
 
-      _computeFabIcon(drawerOpened) {
-        return drawerOpened ? 'sandbox:auto-fix' : 'sandbox:experiment';
+      _computeFabIcon(_drawerOpened) {
+        return _drawerOpened ? 'sandbox:auto-fix' : 'sandbox:experiment';
       }
 
     }

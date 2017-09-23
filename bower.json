@@ -38,7 +38,8 @@
     "app-layout": "PolymerElements/app-layout#^2.0.1",
     "paper-fab": "PolymerElements/paper-fab#^2.0.0",
     "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^2.1.0",
-    "juicy-ace-editor": "Juicy/juicy-ace-editor#^2.0.4"
+    "juicy-ace-editor": "Juicy/juicy-ace-editor#^2.0.4",
+    "paper-number-input": "Zecat/paper-number-input#^1.0.0"
   },
   "devDependencies": {
     "paper-input": "PolymerElements/paper-input#2.0.0",
@@ -46,8 +47,7 @@
     "iron-component-page": "PolymerElements/iron-component-page#^3.0.0",
     "iron-demo-helpers": "PolymerElements/iron-demo-helpers#2.0.0",
     "web-component-tester": "^6.0.0",
-    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
-    "paper-relative-integer-input": "Zecat/paper-relative-integer-input#^0.1.0"
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0"
   },
   "resolutions": {
     "webcomponentsjs": "^1.0.0"

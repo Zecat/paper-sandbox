@@ -124,7 +124,16 @@
       }
 
       _triggerButtonTapHandler() {
-        this.dispatchEvent(new CustomEvent('method-triggered', {bubbles: true, composed: true}));
+        this.dispatchEvent(
+          new CustomEvent(
+            'method-triggered', {
+              detail: {
+                name: this.name,
+                params: this.params
+              },
+              bubbles:
+              true, composed: true
+            }));
       }
     }
 

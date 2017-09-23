@@ -1,44 +1,130 @@
 <link rel="import" href="fetch-analysis.html">
-<link rel="import" href="parse-analysis.html">
-<link rel="import" href="bind-element-to-descriptor.html">
 
 <script>
+
 (()=> {
   'use strict';
 
   if (!window.Zecat) window.Zecat = {};
-  
+
   /**
-   * 
-   * 
+   *
+   *
    * @polymer
    * @mixinFunction
-   * @appliesMixin Zecat.ParseAnalysis
-   * @appliesMixin Zecat.FetchAnalysis
    */
-  Zecat.Sandbox = superClass => class extends
-    Zecat.BindElementToDescriptor(Zecat.ParseAnalysis(Zecat.FetchAnalysis(superClass))) {
-
+  Zecat.Sandbox = (superClass) => class extends Zecat.FetchAnalysis(superClass) {
+    
     static get properties() {
       return {
-        descriptor: {
-          type: Object,
-          value: () => ({})
-        }
+        /**
+         * @type {HTMLElement}
+         */
+        analyzedElement: Object,
+        elementAnalysis: Object,
+        elementEntities: Array
       };
     }
 
     static get observers() {
       return [
-        '_analyzedElementChanged(analyzedElement)'
+        '__updateElementAttribute(elementAnalysis.properties.*, analyzedElement)',
+        '__updateElementEntities(elementAnalysis, analyzedElement)'
       ];
     }
-    
-    async _analyzedElementChanged(analyzedElement) {
-      if (!analyzedElement) return;
+
+    constructor() {
+      super();
+      this._attributeChanged_boundListeners = {};
+    }
+
+    get _propertyGroupNames() {
+      return [
+        'boolean',
+        'string',
+        'number',
+        'date',
+        'array',
+        'object',
+        'generic'
+      ];
+    }
+
+    __updateElementAttribute(cr, element) {
+      const nameSubpath = cr.path.indexOf('.value');
+      if (nameSubpath >= 0) {
+        const itempath = cr.path.substring(0, nameSubpath);
+        const item = this.get(itempath);
+        element[item.name] = item.value;
+      }
+    }
+
+    __updateElementEntities(elementAnalysis) {
+      if (!elementAnalysis) return;
+      this.elementEntities = [];
+      this.push('elementEntities', ...this.__getGroups(elementAnalysis));
+      elementAnalysis.properties.forEach(this.__processProperty.bind(this));
+    }
+
+    __getGroups(elementAnalysis) {
+      let groups = [];
+
+      for (let groupName of this._propertyGroupNames) {
+        groups.push({
+          name: groupName,
+          title: `${groupName.charAt(0).toUpperCase()}${groupName.slice(1)} properties`,
+          items: []
+        });
+      }
+
+      groups.push({
+        name: 'method',
+        title: 'Methods',
+        isDisplayed: true,
+        items: elementAnalysis.methods
+      },{
+        name: 'event',
+        title: 'Events',
+        isDisplayed: true,
+        items: elementAnalysis.events
+      });
       
-      this.descriptor = this.parseAnalysis(
-          await this.fetchAnalysisForElement(this.analyzedElement));
+      return groups;
+    }
+
+    __processProperty(property, analysisPropertyIndex) {
+      property.hyphenatedName = property.name.replace( /([A-Z])/g, "-$1" ).toLowerCase();
+      // Array and Object types are uppercase, we want lowercase
+      let group = property.type.toLowerCase();
+      if (!this._propertyGroupNames.includes(group)) {
+        // assign it to the generic group
+        group = 'generic';
+      }
+      const groupIndex = this._propertyGroupNames.indexOf(group);
+      const groupPropertyIndex = this.elementEntities[groupIndex].items.length;
+      
+      this.push(`elementEntities.${groupIndex}.items`, property);
+      
+      this.linkPaths(
+        `elementAnalysis.properties.${analysisPropertyIndex}`,
+        `elementEntities.${groupIndex}.items.${groupPropertyIndex}`);
+
+      this._setElementAnalysisProperty(analysisPropertyIndex, this.analyzedElement[property.name]);
+
+      let polymer = property.metadata.polymer;
+
+      if (!polymer || !polymer.notify) return;
+
+      const callback = e => {
+        this._setElementAnalysisProperty(analysisPropertyIndex, e.detail.value);
+      };
+      // Keep a reference to the callback for future event listener removal
+      this._attributeChanged_boundListeners[name] = callback;
+      this.analyzedElement.addEventListener(`${property.hyphenatedName}-changed`, callback);
+    }
+
+    _setElementAnalysisProperty(index, value) {
+      this.set(`elementAnalysis.properties.${index}.value`, value);
     }
   };
 })();

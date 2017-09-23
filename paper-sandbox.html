@@ -1,16 +1,16 @@
 <link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../paper-input/paper-input.html">
-<link rel="import" href="../paper-tooltip/paper-tooltip.html">
-<link rel="import" href="../paper-item/paper-item.html">
-<link rel="import" href="../iron-icons/iron-icons.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../paper-number-input/paper-number-input.html">
 <link rel="import" href="../paper-styles/typography.html">
 <link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="paper-sandbox-method.html">
 <link rel="import" href="paper-sandbox-object.html">
 <link rel="import" href="mixins/sandbox.html">
+<link rel="import" href="paper-sandbox-icons.html">
 
 <dom-module id="paper-sandbox">
   <template strip-whitespace>
@@ -55,28 +55,21 @@
       .group-header.elevated {
         @apply --shadow-elevation-2dp;
       }
-      .booleans {
-        @apply --layout-flex;
-        @apply --layout-vertical;
-      }
-      paper-sandbox-method {
+      .list paper-sandbox-method {
         margin: 12px;
         min-width: 200px;
         height: 40px;
       }
-      .booleans paper-checkbox {
+      .list paper-checkbox {
         padding: 8px 12px;
       }
-      .strings {
-        @apply --layout-vertical;
-        @apply --layout-flex;
-      }
-      .numbers {
-        @apply --layout-vertical;
-        @apply --layout-flex;
-      }
-      paper-input {
+      .list paper-input,
+      .list paper-number-input {
         padding: 0 12px;
+      }
+      .list paper-sandbox-object {
+        margin: 16px;
+        z-index: 0;
       }
       #moreBtn {
         display: block;
@@ -94,169 +87,22 @@
       .array > .list,
       .object > .list,
       .generic > .list,
-      .methods > .list {
+      .method > .list {
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      }
-      paper-sandbox-object {
-        margin: 16px;
-        z-index: 0;
       }
     </style>
 
     <paper-icon-button id="moreBtn" icon="more-vert"></paper-icon-button>
 
-    <template
-        is="dom-if"
-        if="[[_shoudDisplayProperty(descriptor.count.boolean, showPrivate, showInherited)]]">
-      <div class="section booleans">
-        <div class="group-header">Boolean properties</div>
+    <template is="dom-repeat"
+        items="{{elementEntities}}"
+        as="group"
+        filter="[[_groupFilter]]"
+        on-dom-change="_handleDomChange">
+      <div class$="section [[group.name]]">
+        <div class="group-header">[[group.title]]</div>
         <div class="list">
-          <template
-              is="dom-repeat"
-              items="{{descriptor.properties.boolean}}"
-              filter="[[filterFn]]">
-            <paper-checkbox checked="{{item.value}}">
-              [[_toHyphenate(item.name)]]
-            </paper-checkbox>
-          </template>
-        </div>
-      </div>
-    </template>
-
-    <template
-        is="dom-if"
-        if="[[_shoudDisplayProperty(descriptor.count.string, showPrivate, showInherited)]]">
-      <div class="section strings">
-        <div class="group-header">String properties</div>
-        <div class="list">
-          <template
-              is="dom-repeat"
-              items="{{descriptor.properties.string}}"
-              filter="[[filterFn]]">
-            <paper-input
-                label="[[_toHyphenate(item.name)]]"
-                value="{{item.value}}">
-            </paper-input>
-          </template>
-        </div>
-      </div>
-    </template>
-
-    <template
-        is="dom-if"
-        if="[[_shoudDisplayProperty(descriptor.count.number, showPrivate, showInherited)]]">
-      <div class="section numbers">
-        <div class="group-header">Number properties</div>
-        <div class="list">
-          <template
-              is="dom-repeat"
-              items="{{descriptor.properties.number}}"
-              filter="[[filterFn]]">
-            <paper-input
-                type="number"
-                label="[[_toHyphenate(item.name)]]"
-                value="{{item.value}}">
-            </paper-input>
-          </template>
-        </div>
-      </div>
-    </template>
-
-    <template
-        is="dom-if"
-        if="[[_shoudDisplayProperty(descriptor.count.date, showPrivate, showInherited)]]">
-      <div class="section dates">
-        <div class="group-header">Date properties</div>
-        <div class="list">
-          <template
-              is="dom-repeat"
-              items="{{descriptor.properties.date}}"
-              filter="[[filterFn]]">
-            <paper-input
-                type="date"
-                label="[[_toHyphenate(item.name)]]"
-                value="{{item.value}}">
-            </paper-input>
-          </template>
-        </div>
-      </div>
-    </template>
-
-    <template
-        is="dom-if"
-        if="[[_shoudDisplayProperty(descriptor.count.object, showPrivate, showInherited)]]">
-      <div class="section object">
-        <div class="group-header">Object properties</div>
-        <div class="list">
-          <template is="dom-repeat"
-              items="{{descriptor.properties.object}}"
-              filter="[[filterFn]]">
-            <paper-sandbox-object
-                label="[[_toHyphenate(item.name)]]"
-                default-value="[[item.defaultValue]]"
-                value="{{item.value}}">
-            </paper-sandbox-object>
-          </template>
-        </div>
-      </div>
-    </template>
-
-    <template
-        is="dom-if"
-        if="[[_shoudDisplayProperty(descriptor.count.array, showPrivate, showInherited)]]">
-      <div class="section array">
-        <div class="group-header">Array properties</div>
-        <div class="list">
-          <template is="dom-repeat"
-              items="{{descriptor.properties.array}}"
-              filter="[[filterFn]]">
-            <paper-sandbox-object
-                label="[[_toHyphenate(item.name)]]"
-                default-value="[[item.defaultValue]]"
-                value="{{item.value}}">
-            </paper-sandbox-object>
-          </template>
-        </div>
-      </div>
-    </template>
-
-    <template
-        is="dom-if"
-        if="[[_shoudDisplayProperty(descriptor.count.generic, showPrivate, showInherited)]]">
-      <div class="section generic">
-        <div class="group-header">Generic properties</div>
-        <div class="list">
-          <template is="dom-repeat"
-              items="{{descriptor.properties.generic}}"
-              filter="[[filterFn]]">
-            <paper-sandbox-object
-                label="[[_toHyphenate(item.name)]]"
-                type="[[item.type]]"
-                default-value="[[item.defaultValue]]"
-                value="{{item.value}}">
-            </paper-sandbox-object>
-          </template>
-        </div>
-      </div>
-    </template>
-
-    <template
-        is="dom-if"
-        if="[[descriptor.count.nonInheritedMethods]]">
-      <div class="section methods">
-        <div class="group-header">Methods</div>
-        <div class="list">
-          <template
-              is="dom-repeat"
-              items="{{descriptor.methods}}"
-              filter="[[filterFn]]">
-            <paper-sandbox-method
-                name="[[item.name]]"
-                description="[[item.description]]"
-                params="{{item.params}}"
-                on-method-triggered="_methodTriggeredHandler">
-            </paper-sandbox-method>
-          </template>
+          <dom-repeat items="{{group.items}}" filter="[[_itemFilter]]"></dom-repeat>
         </div>
       </div>
     </template>
@@ -285,37 +131,95 @@
             type: Boolean,
             value: false
           },
-          filterFn: {
+          _itemFilter: {
             type: Function,
-            computed: '_computeFilterFn(showPrivate, showInherited)'
+            computed: '_compute_itemFilter(showPrivate, showInherited)'
+          },
+          _groupFilter: {
+            type: Function,
+            computed: '_compute_groupFilter(_itemFilter)'
           }
         };
       }
 
       constructor() {
         super();
-        this._setUpDynamicShadows();
+        this.addEventListener('method-triggered', this._methodTriggeredHandler.bind(this));
+        this.groupsTemplate = {
+          boolean: `<paper-checkbox checked="{{item.value}}">
+                        [[item.hyphenatedName]]
+                    </paper-checkbox>`,
+
+          string: `<paper-input type="number" label="[[item.hyphenatedName]]"
+                      value="{{item.value}}">
+                  </paper-input>`,
+
+          number: `<paper-number-input
+                      label="[[item.hyphenatedName]]"
+                      value="{{item.value}}"
+                      step="0.1">
+                  </paper-number-input>`,
+
+          date: `<paper-input
+                    label="[[item.hyphenatedName]]"
+                    value="{{item.value}}">
+                </paper-input>`,
+
+          array: `<paper-sandbox-object
+                      label="[[item.hyphenatedName]]"
+                      default-value="[[item.defaultValue]]"
+                      value="{{item.value}}">
+                  </paper-sandbox-object>`,
+
+          object: `<paper-sandbox-object
+                      label="[[item.hyphenatedName]]"
+                      default-value="[[item.defaultValue]]"
+                      value="{{item.value}}">
+                  </paper-sandbox-object>`,
+
+          generic: `<paper-sandbox-object
+                        label="[[item.hyphenatedName]]"
+                        default-value="[[item.defaultValue]]"
+                        value="{{item.value}}"
+                        type="[[item.type]]">
+                    </paper-sandbox-object>`,
+
+          method: `<paper-sandbox-method
+                      name="[[item.name]]"
+                      description="[[item.description]]"
+                      params="{{item.params}}">
+                  </paper-sandbox-method>`
+        };
       }
 
-      _setUpDynamicShadows() {
+      _compute_groupFilter(_itemFilter) {
+        return group => group.items.find(_itemFilter);
+      }
+
+      _getInputTemplate(groupName) {
+        const template = document.createElement('template');
+        template.innerHTML = this.groupsTemplate[groupName];
+        return template;
+      }
+
+      _handleDomChange(e) {
+        const rootTarget = e.composedPath()[0];
+
+        if (rootTarget.parentNode !== this.shadowRoot ||
+            rootTarget.localName !== 'dom-repeat' ||
+            !this.elementEntities.length) {
+          return;
+        }
+
         const callback = ({[0]: entry}) => {
           entry.target.classList.toggle('elevated', entry.isIntersecting);
         };
+        
+        for (let section of this.shadowRoot.querySelectorAll('.section')) {
+          const group = rootTarget.modelForElement(section).group;
+          const domRepeat = section.querySelector('dom-repeat');
+          domRepeat.appendChild(this._getInputTemplate(group.name));
 
-        this.addEventListener('dom-change', (e) => {
-          const rootTarget = event.composedPath()[0];
-
-          if (rootTarget.parentNode !== this.shadowRoot
-              || rootTarget.localName !== 'dom-if') {
-            return;
-          }
-          // Here, the dom-change event has been dispatched
-          // by a dom-if in the shadow root of this element
-
-          // TODO: ensure an intersectionObserver doesn't already exist for
-          // this section
-
-          const section = rootTarget.previousElementSibling;
           const toolbar = section.querySelector('.group-header');
           const options = {
               root: section,
@@ -323,38 +227,17 @@
           };
           const observer = new IntersectionObserver(callback, options);
           observer.observe(toolbar);
-        });
+        }
       }
 
-      _shoudDisplayProperty(count, showPrivate, showInherited) {
-        if (count == undefined || showPrivate == undefined || showInherited == undefined) return;
-
-        return showPrivate ?
-                (showInherited ? count.total : count.notInherited) :
-                (showInherited ? count.publicInherited : count.publicNotInherited);
-      }
-
-      _stopEventPropagation(e) {console.log(e);
-        e.stopPropagation();
-        e.stopImmediatePropagation();
-      }
-
-      _uppercaseToSpace(value) {
-        return value.replace( /([A-Z])/g, " $1" );
-      }
-
-      _toHyphenate(value) {
-        return value.replace( /([A-Z])/g, "-$1" ).toLowerCase();
-      }
-
-      _computeFilterFn(showPrivate, showInherited) {
+      _compute_itemFilter(showPrivate, showInherited) {
         return item => (showPrivate || item.privacy === 'public') &&
                        (showInherited || item.inheritedFrom === undefined);
       }
 
       _methodTriggeredHandler(e) {
-        const {model} = e, {item: {name, params}} = model;
-        model.set('item.lastResponse', this.analyzedElement[name](...params.map(p => p.value)));
+        const {name, params} = e.detail;
+        e.composedPath()[0].lastResponse = this.analyzedElement[name](...params.map(p => p.value));
       }
     }
 

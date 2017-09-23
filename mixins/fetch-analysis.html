@@ -24,13 +24,22 @@
           value: false,
           readOnly: true,
           notify: true
+        },
+        analysis: Object,
+        analysisPath: String,
+        analyzedElement: Object,
+        tagName: String,
+        elementAnalysis: {
+          type: Object,
+          computed: '_computeElementAnalysis(analysis, tagName)'
         }
       };
     }
 
     static get observers() {
       return [
-        '_disableSpyWhileAutoScrolling(autoScrolling)'
+        '_updateAnalaysisFromPath(analysisPath)',
+        '_analyzedElementChanged(analyzedElement)'
       ];
     }
 
@@ -44,6 +53,20 @@
         4: 'No elements array find in analysis file',
         5: 'No analysis configuration for the given tag name'
       };
+    }
+    
+    async _analyzedElementChanged(el) {
+      if (!el) return;
+
+      if (el.nodeType != Node.ELEMENT_NODE) {
+        this.notifyAnalysisError(1);
+        return;
+      }
+      this.tagName = el.localName;
+      
+      // wait for the element to be defined in order to access its import path
+      await customElements.whenDefined(this.tagName);
+      this.analysisPath = `${el.importPath}analysis.json`;
     }
 
     notifyAnalysisError(code) {
@@ -60,30 +83,14 @@
             }));
     }
 
-    async fetchAnalysisForElement(el, analysisPath) {
-      if (!el) {
-        this.notifyAnalysisError(0);
-        return;
-      }
-      // TODO: The custom element check could be improved following this example:
-      // https://developers.google.com/web/fundamentals/architecture/building-components/shadowdom#findall
-      if (el.nodeType != Node.ELEMENT_NODE) {
-        this.notifyAnalysisError(1);
-        return;
-      }
-
-      if (!analysisPath) {
-        // wait for the element to be defined in order to access its import path
-        await customElements.whenDefined(el.localName);
-        analysisPath = `${el.importPath}analysis.json`;
-      }
+    async _updateAnalaysisFromPath(analysisPath) {
+      if (!analysisPath) return;
 
       let fetchAnalysis;
 
+      this._setFetchingAnalysis(true);
       try {
-        this._setFetchingAnalysis(true);
         fetchAnalysis = await fetch(analysisPath);
-        this._setFetchingAnalysis(false);
       } catch (err) {
         this._setFetchingAnalysis(false);
         this.notifyAnalysisError(2);
@@ -92,26 +99,18 @@
 
       if (!fetchAnalysis.ok) {
         this.notifyAnalysisError(3);
+        this._setFetchingAnalysis(false);
         return;
       }
 
-      const {elements} = await fetchAnalysis.json();
-      if (!elements || !(elements instanceof Array)) {
-        this.notifyAnalysisError(4);
-        return;
-      }
-
-      const tagName = el.nodeName.toLowerCase();
-      const configForEl = elements.find(elConfig => elConfig.tagname === tagName);
-
-      if (!configForEl) {
-        this.notifyAnalysisError(5);
-        return;
-      }
-
-      return configForEl;
+      this.analysis = await fetchAnalysis.json();
+      this._setFetchingAnalysis(false);
     }
 
+    _computeElementAnalysis(analysis, tagName) {
+      if (!analysis || !tagName) return;
+      return analysis.elements.find(element => element.tagname === tagName);
+    }
   };
 })();
 </script>
