@@ -94,11 +94,10 @@
 
     <paper-icon-button id="moreBtn" icon="more-vert"></paper-icon-button>
 
-    <template is="dom-repeat"
+    <template is="dom-repeat" id="sectionsDomRepeat"
         items="{{elementEntities}}"
         as="group"
-        filter="[[_groupFilter]]"
-        on-dom-change="_handleDomChange">
+        filter="[[_groupFilter]]">
       <div class$="section [[group.name]]">
         <div class="group-header">[[group.title]]</div>
         <div class="list">
@@ -192,6 +191,76 @@
         };
       }
 
+      connectedCallback() {
+        super.connectedCallback();
+
+        /**
+         * @type {Function}
+         * @param {Object} mutations The mutations descriptor
+         * Handler for node mutations on this element's shadow root.
+         */
+        const shadowNodeMutationsHandler = mutations => {
+          for (let {addedNodes} of mutations) {
+            for (let addedNode of addedNodes) {
+              if (!addedNode.classList.contains('section')) break;
+              // Here, the addedNode is a 'section' that we want to process
+
+              this.__processAddedSection(addedNode);
+            }
+          }    
+        };
+
+        /**
+         * @type {MutationObserver}
+         * An mutation observer ready to process added sections nodes.
+         */
+        const observer = new MutationObserver(shadowNodeMutationsHandler);
+
+        // Activate the observer which processes added sections nodes.
+        observer.observe(this.shadowRoot, {childList: true});
+      }
+
+      /**
+       * Processes an added section node in this element shadow dom.
+       * 
+       * Generates section content and create an intersection observer
+       * to display a shadow on the section toolbar when it intersects with
+       * its main content.
+       *
+       * @param {HTMLElement} sectionNode The section node to process.
+       */
+      __processAddedSection(sectionNode) {
+        const model = this.$.sectionsDomRepeat.modelForElement(sectionNode);
+        const groupName = model.group.name;
+        const groupTemplate = this._getInputTemplate(groupName);
+        const domRepeat = sectionNode.querySelector('dom-repeat');
+
+        // Generate content adding the right template to the dom-repeat
+        domRepeat.appendChild(groupTemplate);
+
+        /**
+         * @type {HTMLElement}
+         * The section toolbar.
+         */
+        const toolbar = sectionNode.querySelector('.group-header');
+
+        /**
+         * @type {{root: HTMLElement, rootMargin: String}}
+         * The intersection observer options.
+         */
+        const options = {
+            root: sectionNode,
+            rootMargin: `-${toolbar.clientHeight+2}px 0px 0px 0px`
+        };
+        const observer = new IntersectionObserver(this.__sectionToolbarIntersectCallback, options);
+
+        observer.observe(toolbar);
+      }
+
+      __sectionToolbarIntersectCallback({[0]: entry}) {
+        entry.target.classList.toggle('elevated', entry.isIntersecting);
+      }
+
       _compute_groupFilter(_itemFilter) {
         return group => group.items.find(_itemFilter);
       }
@@ -200,34 +269,6 @@
         const template = document.createElement('template');
         template.innerHTML = this.groupsTemplate[groupName];
         return template;
-      }
-
-      _handleDomChange(e) {
-        const rootTarget = e.composedPath()[0];
-
-        if (rootTarget.parentNode !== this.shadowRoot ||
-            rootTarget.localName !== 'dom-repeat' ||
-            !this.elementEntities.length) {
-          return;
-        }
-
-        const callback = ({[0]: entry}) => {
-          entry.target.classList.toggle('elevated', entry.isIntersecting);
-        };
-        
-        for (let section of this.shadowRoot.querySelectorAll('.section')) {
-          const group = rootTarget.modelForElement(section).group;
-          const domRepeat = section.querySelector('dom-repeat');
-          domRepeat.appendChild(this._getInputTemplate(group.name));
-
-          const toolbar = section.querySelector('.group-header');
-          const options = {
-              root: section,
-              rootMargin: `-${toolbar.clientHeight+2}px 0px 0px 0px`
-          };
-          const observer = new IntersectionObserver(callback, options);
-          observer.observe(toolbar);
-        }
       }
 
       _compute_itemFilter(showPrivate, showInherited) {
