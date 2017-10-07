@@ -61,10 +61,7 @@
 
     __updateElementEntities(elementAnalysis) {
       if (!elementAnalysis) return;
-      this.elementEntities = this.__generateEntitiesForAnalysis(elementAnalysis);
-    }
 
-    __generateEntitiesForAnalysis(elementAnalysis) {
       let groups = [];
       
       for (let groupName of this._propertyGroupNames) {
@@ -126,7 +123,7 @@
         items: elementAnalysis.events
       });
       
-      return groups;
+      this.elementEntities = groups;
     }
 
     _setElementAnalysisProperty(index, value) {
