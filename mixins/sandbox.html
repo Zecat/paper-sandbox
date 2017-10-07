@@ -61,13 +61,12 @@
 
     __updateElementEntities(elementAnalysis) {
       if (!elementAnalysis) return;
-      this.elementEntities = this.__getGroups(elementAnalysis);
-      elementAnalysis.properties.forEach(this.__processProperty.bind(this));
+      this.elementEntities = this.__generateEntitiesForAnalysis(elementAnalysis);
     }
 
-    __getGroups(elementAnalysis) {
+    __generateEntitiesForAnalysis(elementAnalysis) {
       let groups = [];
-
+      
       for (let groupName of this._propertyGroupNames) {
         groups.push({
           name: groupName,
@@ -75,6 +74,45 @@
           items: []
         });
       }
+
+      /**
+       * @type {Function}
+       * @param {Object} property The property to link.
+       * @param {number} analysisPropertyIndex The index of the property in the `elementAnalysis` array.
+       */
+      const initializeProperty = (property, analysisPropertyIndex) => {
+        property.hyphenatedName = property.name.replace( /([A-Z])/g, "-$1" ).toLowerCase();
+        // Array and Object types are uppercase, we want lowercase
+        let group = property.type.toLowerCase();
+        if (!this._propertyGroupNames.includes(group)) {
+          // assign it to the generic group
+          group = 'generic';
+        }
+        const groupIndex = this._propertyGroupNames.indexOf(group);
+        const propertyGroupItems = groups[groupIndex].items;
+        const groupPropertyIndex = propertyGroupItems.length;
+        propertyGroupItems.push(property);
+
+        this.linkPaths(
+          `elementAnalysis.properties.${analysisPropertyIndex}`,
+          `elementEntities.${groupIndex}.items.${groupPropertyIndex}`);
+
+        let polymerMetadata = property.metadata.polymer;
+
+        if (!polymerMetadata || !polymerMetadata.notify) return;
+
+        this._setElementAnalysisProperty(analysisPropertyIndex, this.analyzedElement[property.name]);
+        
+        const callback = e => {
+          this._setElementAnalysisProperty(analysisPropertyIndex, e.detail.value);
+        };
+        // Keep a reference to the callback for future event listener removal
+        this._attributeChanged_boundListeners[name] = callback;
+        this.analyzedElement.addEventListener(`${property.hyphenatedName}-changed`, callback);
+      };
+      
+      // Initialize properties
+      elementAnalysis.properties.forEach(initializeProperty);
 
       groups.push({
         name: 'method',
@@ -89,36 +127,6 @@
       });
       
       return groups;
-    }
-
-    __processProperty(property, analysisPropertyIndex) {
-      property.hyphenatedName = property.name.replace( /([A-Z])/g, "-$1" ).toLowerCase();
-      // Array and Object types are uppercase, we want lowercase
-      let group = property.type.toLowerCase();
-      if (!this._propertyGroupNames.includes(group)) {
-        // assign it to the generic group
-        group = 'generic';
-      }
-      const groupIndex = this._propertyGroupNames.indexOf(group);
-      const groupPropertyIndex = this.elementEntities[groupIndex].items.length;
-      
-      this.push(`elementEntities.${groupIndex}.items`, property);
-      
-      this.linkPaths(
-        `elementAnalysis.properties.${analysisPropertyIndex}`,
-        `elementEntities.${groupIndex}.items.${groupPropertyIndex}`);
-      this._setElementAnalysisProperty(analysisPropertyIndex, this.analyzedElement[property.name]);
-
-      let polymer = property.metadata.polymer;
-
-      if (!polymer || !polymer.notify) return;
-
-      const callback = e => {
-        this._setElementAnalysisProperty(analysisPropertyIndex, e.detail.value);
-      };
-      // Keep a reference to the callback for future event listener removal
-      this._attributeChanged_boundListeners[name] = callback;
-      this.analyzedElement.addEventListener(`${property.hyphenatedName}-changed`, callback);
     }
 
     _setElementAnalysisProperty(index, value) {
