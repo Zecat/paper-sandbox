@@ -61,8 +61,7 @@
 
     __updateElementEntities(elementAnalysis) {
       if (!elementAnalysis) return;
-      this.elementEntities = [];
-      this.push('elementEntities', ...this.__getGroups(elementAnalysis));
+      this.elementEntities = this.__getGroups(elementAnalysis);
       elementAnalysis.properties.forEach(this.__processProperty.bind(this));
     }
 
@@ -108,7 +107,6 @@
       this.linkPaths(
         `elementAnalysis.properties.${analysisPropertyIndex}`,
         `elementEntities.${groupIndex}.items.${groupPropertyIndex}`);
-
       this._setElementAnalysisProperty(analysisPropertyIndex, this.analyzedElement[property.name]);
 
       let polymer = property.metadata.polymer;
