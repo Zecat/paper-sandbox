@@ -96,9 +96,9 @@
 
         let polymerMetadata = property.metadata.polymer;
 
-        if (!polymerMetadata || !polymerMetadata.notify) return;
-
         this._setElementAnalysisProperty(analysisPropertyIndex, this.analyzedElement[property.name]);
+        
+        if (!polymerMetadata || !polymerMetadata.notify) return;
         
         const callback = e => {
           this._setElementAnalysisProperty(analysisPropertyIndex, e.detail.value);
