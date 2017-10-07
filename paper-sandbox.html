@@ -132,13 +132,24 @@
           },
           _itemFilter: {
             type: Function,
-            computed: '_compute_itemFilter(showPrivate, showInherited)'
+            computed: '_compute_itemFilter(filters.*)'
           },
           _groupFilter: {
             type: Function,
             computed: '_compute_groupFilter(_itemFilter)'
+          },
+          filters: {
+            type: Object,
+            computed: '_computeFilters(elementEntities, initialDisplayedInheritance)'
+          },
+          initialDisplayedInheritance: {
+            type: Array,
+            value: () => [this.notInheritedLabel]
           }
         };
+      }
+      static get notInheritedLabel() {
+        return 'Not Inherited';
       }
 
       constructor() {
@@ -271,14 +282,49 @@
         return template;
       }
 
-      _compute_itemFilter(showPrivate, showInherited) {
-        return item => (showPrivate || item.privacy === 'public') &&
-                       (showInherited || item.inheritedFrom === undefined);
+      _compute_itemFilter() {
+        return item => {
+          const findFilterForInheritance = inheritedFrom => {
+            return this.filters.find(filter => filter.inheritedFrom === inheritedFrom);
+          };
+          const inheritedFrom = item.inheritedFrom || this.constructor.notInheritedLabel;
+          const filter = findFilterForInheritance(inheritedFrom);
+          
+          return filter.selected && filter[item.privacy];
+        };
       }
 
       _methodTriggeredHandler(e) {
         const {name, params} = e.detail;
         e.composedPath()[0].lastResponse = this.analyzedElement[name](...params.map(p => p.value));
+      }
+
+      _computeFilters(elementEntities, initialDisplayedInheritance) {
+        if (!(elementEntities instanceof Array) ||
+            !(initialDisplayedInheritance instanceof Array)) return;
+            
+        let filters = [];
+        
+        const findFilterForInheritance = inheritedFrom =>
+          filters.find(filter => filter.inheritedFrom === inheritedFrom);
+        
+        for (let {items: entityItems} of elementEntities) {
+          for (let {inheritedFrom = this.constructor.notInheritedLabel} of entityItems) {
+            if (findFilterForInheritance(inheritedFrom)) break;
+
+            const value = {
+              inheritedFrom,
+              selected: initialDisplayedInheritance.includes(inheritedFrom),
+              public: true,
+              private: false,
+              protected: false
+            };
+
+            filters.push(value);
+          }
+        }
+
+        return filters;
       }
     }
 

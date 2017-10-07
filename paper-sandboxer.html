@@ -54,7 +54,7 @@
       <app-drawer id="drawer" slot="drawer"
           swipe-open
           opened="{{_drawerOpened}}">
-        <paper-sandbox id="sandbox"></paper-sandbox>
+        <paper-sandbox id="sandbox" initial-displayed-inheritance="[[initialDisplayedInheritance]]"></paper-sandbox>
       </app-drawer>
       <div>
         <slot id="slot" on-slotchange="_slotChangeHandler"></slot>
@@ -84,7 +84,8 @@
            */
           tag: String,
           _drawerOpened: Boolean,
-          _narrow: Boolean
+          _narrow: Boolean,
+          initialDisplayedInheritance: Array
         };
       }
 
