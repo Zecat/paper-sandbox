@@ -5,6 +5,7 @@
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-number-input/paper-number-input.html">
+<link rel="import" href="../paper-swatch-picker/paper-swatch-picker.html">
 <link rel="import" href="../paper-styles/typography.html">
 <link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="paper-sandbox-method.html">
@@ -90,6 +91,11 @@
       .method > .list,
       .cssVariable > .list {
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      }
+      paper-swatch-picker {
+        position: absolute;
+        right: 0;
+        bottom: -8px;
       }
     </style>
 
@@ -202,9 +208,14 @@
                   </paper-sandbox-method>`,
 
           cssVariable: `<paper-input
-                          label="[[item.name]]"
-                          title$="[[item.description]]"
-                          value="{{item.value}}">
+                            label="[[item.name]]"
+                            title$="[[item.description]]"
+                            value="{{item.value}}">
+                          <template is="dom-if" if="[[item.color]]">
+                            <paper-swatch-picker slot="suffix" tabindex="-1"
+                                color="{{item.value}}">
+                            </paper-swatch-picker>
+                          </template>
                         </paper-input>`
         };
       }
