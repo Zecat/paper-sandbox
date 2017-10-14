@@ -87,7 +87,8 @@
       .array > .list,
       .object > .list,
       .generic > .list,
-      .method > .list {
+      .method > .list,
+      .cssVariable > .list {
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       }
     </style>
@@ -198,7 +199,13 @@
                       name="[[item.name]]"
                       description="[[item.description]]"
                       params="{{item.params}}">
-                  </paper-sandbox-method>`
+                  </paper-sandbox-method>`,
+
+          cssVariable: `<paper-input
+                          label="[[item.name]]"
+                          title$="[[item.description]]"
+                          value="{{item.value}}">
+                        </paper-input>`
         };
       }
 

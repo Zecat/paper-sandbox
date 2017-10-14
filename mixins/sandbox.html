@@ -22,14 +22,20 @@
          */
         analyzedElement: Object,
         elementAnalysis: Object,
-        elementEntities: Array
+        elementEntities: Array,
+        cssVariables: {
+          type: Array,
+          value: () => ([])
+        }
       };
     }
 
     static get observers() {
       return [
         '__updateElementAttribute(elementAnalysis.properties.*, analyzedElement)',
-        '__updateElementEntities(elementAnalysis, analyzedElement)'
+        '__updateElementEntities(elementAnalysis, analyzedElement)',
+        '__updateCssVariables(cssVariables, elementEntities, analyzedElement, elementAnalysis)',
+        '__updateElementStyles(elementAnalysis.cssVariables.*, analyzedElement)'
       ];
     }
 
@@ -48,6 +54,20 @@
         'object',
         'generic'
       ];
+    }
+
+    __updateElementStyles(cr, element) {
+      if (cr === undefined || element === undefined) return;
+      
+      const nameSubpath = cr.path.indexOf('.value');
+      
+      if (nameSubpath >= 0) {
+        const itempath = cr.path.substring(0, nameSubpath);
+        const item = this.get(itempath);
+        element.updateStyles({
+          [item.name]: item.value
+        });
+      }
     }
 
     __updateElementAttribute(cr, element) {
@@ -130,6 +150,47 @@
 
     _setElementAnalysisProperty(index, value) {
       this.set(`elementAnalysis.properties.${index}.value`, value);
+    }
+
+    __updateCssVariables(cssVariables, elementEntities, analyzedElement, elementAnalysis) {
+      if (elementAnalysis === undefined ||
+          !(analyzedElement instanceof HTMLElement) ||
+          !(elementEntities instanceof Array) ||
+          !(cssVariables instanceof Array) ||
+          !cssVariables.length) return;
+          
+      // The observer is sometime call twice, this is a hack for not adding css variables a second time
+      if (elementEntities.find(group => group.name === 'cssVariable')) return;
+
+      const cssVariableItems = [];
+
+      for (let cssVariable of cssVariables) {
+        const cssVariableItem = Object.assign(
+          cssVariable,
+          {
+            value: cssVariable.defaultValue,
+            privacy: 'public'
+          }
+        );
+
+        cssVariableItems.push(cssVariableItem);
+      }
+
+      const cssVariableGroup = {
+        name: 'cssVariable',
+        title: 'CSS variables',
+        items: cssVariableItems
+      };
+
+      const groupIndex = this.elementEntities.length;
+
+      this.push('elementEntities', cssVariableGroup);
+
+      this.set('elementAnalysis.cssVariables', cssVariableGroup.items);
+
+      this.linkPaths(
+        `elementAnalysis.cssVariables`,
+        `elementEntities.${groupIndex}.items`);
     }
   };
 })();
