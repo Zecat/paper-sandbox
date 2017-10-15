@@ -36,10 +36,11 @@
         background: inherit;
         height: 64px;
         padding: 0 64px 0 38px;
-        line-height: 64px;
-        vertical-align: middle;
         z-index: 1;
         @apply --shadow-transition;
+        @apply --layout-center;
+        @apply --layout-justified;
+        @apply --layout-horizontal;
       }
       .group-header:before {
         display: block;
@@ -102,9 +103,31 @@
         as="group"
         filter="[[_groupFilter]]">
       <div class$="section [[group.name]]">
-        <div class="group-header">[[group.title]]</div>
+        <div class="group-header">
+          [[group.title]]
+          <template is="dom-if" if="[[_groupHasAttachment(attachments, group.name)]]">
+            <paper-menu-button
+                horizontal-align="right"
+                vertical-offset="8"
+                on-paper-dropdown-close="_handleAttachmentDropdownClose">
+              <paper-icon-button
+                  slot="dropdown-trigger"
+                  icon="sandbox:attachment">
+              </paper-icon-button>
+              <paper-listbox slot="dropdown-content"
+                  on-iron-select="_handleAttachmentSelection"
+                  attr-for-selected="data-item">
+                <template is="dom-repeat"
+                    items="[[_getAttachment(attachments, group.name)]]"
+                    class="attachment-items-dom-repeat">
+                  <paper-item data-item$="[[item.name]]">[[item.name]]</paper-item>
+                </template>
+              </paper-listbox>
+            </paper-menu-button>
+          </template>
+        </div>
         <div class="list">
-          <dom-repeat items="{{group.items}}" filter="[[_itemFilter]]"></dom-repeat>
+          <dom-repeat class="dom-repeat-items" items="{{group.items}}" filter="[[_itemFilter]]"></dom-repeat>
         </div>
       </div>
     </template>
@@ -128,6 +151,9 @@
           showPrivate: {
             type: Boolean,
             value: false
+          },
+          attachments: {
+            type: Object
           },
           showInherited: {
             type: Boolean,
@@ -250,7 +276,7 @@
         const model = this.$.sectionsDomRepeat.modelForElement(sectionNode);
         const groupName = model.group.name;
         const groupTemplate = this._getInputTemplate(groupName);
-        const domRepeat = sectionNode.querySelector('dom-repeat');
+        const domRepeat = sectionNode.querySelector('.dom-repeat-items');
 
         // Generate content adding the right template to the dom-repeat
         domRepeat.appendChild(groupTemplate);
@@ -331,6 +357,45 @@
         }
 
         return filters;
+      }
+
+      _groupHasAttachment(attachments, groupName) {
+        if (attachments === undefined || groupName === undefined) return;
+
+        return Object.keys(attachments).includes(groupName);
+      }
+
+      _getAttachment(attachments, groupName) {
+        if (attachments === undefined || groupName === undefined) return;
+
+        return attachments[groupName];
+      }
+      
+      _handleAttachmentSelection(event) {
+        const fromTarget = event.composedPath()[0];
+
+        const groupModel = this.$.sectionsDomRepeat.modelForElement(fromTarget);
+        const group = groupModel.group;
+        const groupIndex = this.elementEntities.indexOf(group);
+        const groupItems = group.items;
+
+        const attachmentDomRepeat = fromTarget.querySelector('.attachment-items-dom-repeat'); 
+        const item = event.detail.item;
+        const model = attachmentDomRepeat.modelForElement(item);
+        const attachmentItems = model.item.items; 
+
+        const itemsPath = `elementEntities.${groupIndex}.items.`;
+
+        for (let {name, value} of attachmentItems) {
+          const itemIndex = groupItems.findIndex(item => item.name === name);
+          this.set(`${itemsPath}${itemIndex}.value`, value);
+        }
+      }
+
+      _handleAttachmentDropdownClose(event) {
+        const menuButton = event.composedPath()[0];
+        const paperListbox = menuButton.querySelector('paper-listbox');
+        paperListbox.selected = null;
       }
     }
 
