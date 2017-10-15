@@ -316,7 +316,7 @@
         
         for (let {items: entityItems} of elementEntities) {
           for (let {inheritedFrom = this.constructor.notInheritedLabel} of entityItems) {
-            if (findFilterForInheritance(inheritedFrom)) break;
+            if (findFilterForInheritance(inheritedFrom)) continue;
 
             const value = {
               inheritedFrom,
