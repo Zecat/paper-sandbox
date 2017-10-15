@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>paper-sandbox demo</title>
+
+    <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
+    <link rel="import" href="../paper-sandboxer.html">
+    <link rel="import" href="../paper-sandbox-css-variable.html">
+  </head>
+
+  <body>
+
+    <style>
+      body {
+        min-height: 100vh;
+        margin: 0;
+      }
+      paper-sandboxer {
+        --app-drawer-width: 850px;
+      }
+      #wrapper {
+        padding: 42px;
+        box-sizing: border-box;
+        height: 100vh;
+      }
+      paper-sandbox-css-variable {
+        width: 300px;
+      }
+    </style>
+
+    <paper-sandboxer tag="paper-sandbox-css-variable">
+      <div id="wrapper">
+        <paper-sandbox-css-variable item='{"name": "--a-css-color-property", "description": "Some documentation", "defaultValue": "red", "isColor": true}'></paper-sandbox-css-variable>
+      </div>
+    </paper-sandboxer>
+  </body>
+</html>

@@ -1,0 +1,167 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../paper-input/paper-input.html">
+<link rel="import" href="../paper-swatch-picker/paper-swatch-picker.html">
+<link rel="import" href="../paper-slider/paper-slider.html">
+
+<dom-module id="paper-sandbox-css-variable">
+  <template>
+    <style>
+      :host {
+        position: relative;
+        display: inline-block;
+        box-sizing: border-box;
+      }
+
+      paper-input.has-icon {
+        --paper-input-container-label: {
+          padding-right: 46px;
+          box-sizing: border-box;
+        };
+        --paper-input-container-label-floating: {
+          padding-right: 0;
+        };
+      }
+
+      paper-input {
+        --paper-input-container-input: {
+          padding-bottom: 16px;
+        };
+      }
+
+      paper-swatch-picker {
+        position: absolute;
+        right: 4px;
+        bottom: 0;
+      }
+
+      paper-slider {
+        position: absolute;
+        bottom: -7px;
+        right: -16px;
+        left: -16px;
+        width: initial;
+        cursor: pointer;
+        --paper-slider-knob-start-color: #fff;
+        --paper-slider-container-color: transparent;
+        --paper-slider-active-color: var(--accent-color);
+        --paper-slider-knob-color: var(--accent-color);
+      }
+
+    </style>
+
+    <paper-input
+        class$="[[__getInputClass(item.isColor)]]"
+        label="[[item.name]]"
+        title$="[[item.description]]"
+        value="{{item.value}}">
+    </paper-input>
+
+    <template is="dom-if" if="[[item.isColor]]">
+      <paper-swatch-picker slot="suffix"
+          color="{{item.value}}">
+      </paper-swatch-picker>
+    </template>
+
+    <template is="dom-if" if="[[item.isNumber]]">
+      <paper-slider slot="suffix"
+          min="[[item.min]]"
+          max="[[item.max]]"
+          step="[[_computeStep(item.step, 1)]]"
+          value="[[item._numberValue]]"
+          on-change="__numberPicked">
+      </paper-slider>
+    </template>
+
+  </template>
+
+  <script>
+    /**
+     * Missing Description
+     * 
+     * @customElement
+     * @polymer
+     */
+    class PaperSandboxCssVariable extends Polymer.Element {
+
+      static get is() { return 'paper-sandbox-css-variable'; }
+
+      static get properties() {
+        return {
+          /**
+           * A configuration object that may contain keys:
+           * - name
+           * - description
+           * - value
+           * - isNumber
+           * - isColor
+           * - step
+           * - min
+           * - max
+           * - defaultNumberUnit
+           */
+          item: Object,
+          _numberValue: {
+            type: Number,
+            value: 0
+          },
+          _hasNumber: {
+            type: Boolean,
+            value: false
+          }
+        };
+      }
+
+      static get observers() {
+        return [
+          '_parseValue(item.value)'
+        ];
+      }
+
+      get _sliderValue() {
+        if (!this.$.slider) {
+          this.$.slider = this.shadowRoot.querySelector('paper-slider');
+          if (this.$.slider === null) return;
+        }
+        return this.$.slider.value;
+      }
+
+      __getInputClass(isColor) {
+        if (isColor) {
+          return 'has-icon';
+        }
+      }
+
+      __numberPicked() {
+        let value = String(this._sliderValue);
+        let unit = this.item.unit;
+        if (unit == undefined) {
+          unit = this.item.defaultNumberUnit;
+        } 
+        if (unit != undefined) {
+          value += unit;
+        }
+        this.set('item.value', value);
+      }
+
+      _parseValue(value) {
+        if (value == undefined) return;
+
+        const numberRegExp = /^((?:[+-]?[0-9]*)+(?:\.[0-9]+)?)?(.*)?$/i;
+        const match = value.match(numberRegExp);
+        const [, number, unit] = match;
+        const _hasNumber = number !== undefined;
+        this.set('item._numberValue', _hasNumber ? parseFloat(number) : 0);
+        this.set('item.unit', unit);
+      }
+
+      _computeStep(step, defaultValue) {
+        if (step !== undefined) return step;
+        return defaultValue;
+      }
+
+    }
+
+    window.customElements.define(PaperSandboxCssVariable.is, PaperSandboxCssVariable);
+
+  </script>
+</dom-module>

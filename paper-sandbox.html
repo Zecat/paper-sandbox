@@ -5,11 +5,11 @@
 <link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-number-input/paper-number-input.html">
-<link rel="import" href="../paper-swatch-picker/paper-swatch-picker.html">
 <link rel="import" href="../paper-styles/typography.html">
 <link rel="import" href="../paper-styles/shadow.html">
 <link rel="import" href="paper-sandbox-method.html">
 <link rel="import" href="paper-sandbox-object.html">
+<link rel="import" href="paper-sandbox-css-variable.html">
 <link rel="import" href="mixins/sandbox.html">
 <link rel="import" href="paper-sandbox-icons.html">
 
@@ -65,8 +65,9 @@
         padding: 8px 12px;
       }
       .list paper-input,
-      .list paper-number-input {
-        padding: 0 12px;
+      .list paper-number-input,
+      .list paper-sandbox-css-variable {
+        margin: 0 12px;
       }
       .list paper-sandbox-object {
         margin: 16px;
@@ -91,11 +92,6 @@
       .method > .list,
       .cssVariable > .list {
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-      }
-      paper-swatch-picker {
-        position: absolute;
-        right: 0;
-        bottom: -8px;
       }
     </style>
 
@@ -207,16 +203,8 @@
                       params="{{item.params}}">
                   </paper-sandbox-method>`,
 
-          cssVariable: `<paper-input
-                            label="[[item.name]]"
-                            title$="[[item.description]]"
-                            value="{{item.value}}">
-                          <template is="dom-if" if="[[item.color]]">
-                            <paper-swatch-picker slot="suffix" tabindex="-1"
-                                color="{{item.value}}">
-                            </paper-swatch-picker>
-                          </template>
-                        </paper-input>`
+          cssVariable: `<paper-sandbox-css-variable item="{{item}}">
+                        </paper-sandbox-css-variable>`
         };
       }
 
@@ -307,7 +295,7 @@
           };
           const inheritedFrom = item.inheritedFrom || this.constructor.notInheritedLabel;
           const filter = findFilterForInheritance(inheritedFrom);
-          
+
           return filter.selected && filter[item.privacy];
         };
       }

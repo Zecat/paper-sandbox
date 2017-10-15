@@ -39,7 +39,9 @@
     "paper-fab": "PolymerElements/paper-fab#^2.0.0",
     "iron-iconset-svg": "PolymerElements/iron-iconset-svg#^2.1.0",
     "juicy-ace-editor": "Juicy/juicy-ace-editor#^2.0.4",
-    "paper-number-input": "Zecat/paper-number-input#^1.0.0"
+    "paper-number-input": "Zecat/paper-number-input#^1.0.0",
+    "paper-swatch-picker": "PolymerElements/paper-swatch-picker#^2.0.1",
+    "paper-slider": "PolymerElements/paper-slider#^2.0.2"
   },
   "devDependencies": {
     "paper-input": "PolymerElements/paper-input#2.0.0",
