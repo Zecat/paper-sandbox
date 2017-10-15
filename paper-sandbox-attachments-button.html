@@ -62,9 +62,10 @@
         
         if (!(attachmentItems instanceof Array)) return;
 
-        attachmentItems.forEach(({value: itemValue}, itemIndex) => {
-          this.set(['items', itemIndex, 'value'], itemValue);
-        });
+        for (let {name: attachmentItemName, value: attachmentItemValue} of attachmentItems) {
+          const itemIndex = this.items.findIndex(item => item.name === attachmentItemName);
+          this.set(['items', itemIndex, 'value'], attachmentItemValue);
+        }
       }
 
       _handleAttachmentDropdownClose(event) {
