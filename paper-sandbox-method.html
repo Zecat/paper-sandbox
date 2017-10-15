@@ -17,16 +17,13 @@
   <template strip-whitespace>
     <style>
       :host {
-        display: block;
+        @apply --layout-horizontal;
       }
        paper-badge {
         --paper-badge-background: transparent;
         --paper-badge-text-color: black;
         --paper-badge-margin-left: -2px;
         --paper-badge-margin-bottom: -2px;
-      }
-      :host {
-        @apply --layout-horizontal;
       }
       #methodButton, #methodParamsButton {
         background: white;
