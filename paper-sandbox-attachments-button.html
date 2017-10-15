@@ -1,0 +1,81 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../paper-listbox/paper-listbox.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../paper-item/paper-item.html">
+<link rel="import" href="paper-sandbox-icons.html">
+
+<dom-module id="paper-sandbox-attachments-button">
+  <template>
+    <style>
+      paper-icon-button {
+        color: var(--primary-text-color);
+      }
+    </style>
+
+    <paper-menu-button
+        horizontal-align="right"
+        vertical-offset="-4"
+        on-paper-dropdown-close="_handleAttachmentDropdownClose">
+      <paper-icon-button
+          slot="dropdown-trigger"
+          icon="sandbox:attachment">
+      </paper-icon-button>
+      <paper-listbox slot="dropdown-content"
+          on-iron-select="_handleAttachmentSelection">
+        <template is="dom-repeat" id="attachmentsRepeater"
+            items="[[attachments]]"
+            class="attachment-items-dom-repeat">
+          <paper-item>[[item.name]]</paper-item>
+        </template>
+      </paper-listbox>
+    </paper-menu-button>
+
+  </template>
+
+  <script>
+    /**
+     * Missing Description
+     * 
+     * @customElement
+     * @polymer
+     */
+    class PaperSandboxAttachmentsButton extends Polymer.Element {
+
+      static get is() { return 'paper-sandbox-attachments-button'; }
+
+      static get properties() {
+        return {
+          attachments: Array,
+          items: {
+            type: Array,
+            notify: true
+          }
+        };
+      }
+      
+      _handleAttachmentSelection(event) {
+        const item = event.detail.item;
+        const model = this.$.attachmentsRepeater.modelForElement(item);
+        const attachment = model.item;
+        const attachmentItems = attachment.items;
+        
+        if (!(attachmentItems instanceof Array)) return;
+
+        attachmentItems.forEach(({value: itemValue}, itemIndex) => {
+          this.set(['items', itemIndex, 'value'], itemValue);
+        });
+      }
+
+      _handleAttachmentDropdownClose(event) {
+        const menuButton = event.composedPath()[0];
+        const paperListbox = menuButton.querySelector('paper-listbox');
+        paperListbox.selected = null;
+      }
+
+    }
+
+    window.customElements.define(PaperSandboxAttachmentsButton.is, PaperSandboxAttachmentsButton);
+
+  </script>
+</dom-module>
