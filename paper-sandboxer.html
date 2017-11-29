@@ -55,6 +55,7 @@
           swipe-open
           opened="{{_drawerOpened}}">
         <paper-sandbox id="sandbox"
+	    analysis-path="[[analysisPath]]"
             initial-displayed-inheritance="[[initialDisplayedInheritance]]"
             css-variables="[[cssVariables]]"
             attachments="[[attachments]]">
@@ -87,6 +88,7 @@
            * @type {String}
            */
           tag: String,
+	  analysisPath: String,
           _drawerOpened: Boolean,
           _narrow: Boolean,
           initialDisplayedInheritance: Array,

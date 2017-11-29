@@ -63,6 +63,8 @@
         return;
       }
       this.tagName = el.localName;
+
+      if (this.analysisPath) return;
       
       // wait for the element to be defined in order to access its import path
       await customElements.whenDefined(this.tagName);
