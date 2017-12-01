@@ -28,10 +28,14 @@
         analysis: Object,
         analysisPath: String,
         analyzedElement: Object,
+        tagNameDefined: {
+          type: Boolean,
+          value: false
+        },
         tagName: String,
         elementAnalysis: {
           type: Object,
-          computed: '_computeElementAnalysis(analysis, tagName)'
+          computed: '_computeElementAnalysis(analysis, tagName, tagNameDefined)'
         }
       };
     }
@@ -64,11 +68,13 @@
       }
       this.tagName = el.localName;
 
-      if (this.analysisPath) return;
-      
+
       // wait for the element to be defined in order to access its import path
       await customElements.whenDefined(this.tagName);
-      this.analysisPath = `${el.importPath}analysis.json`;
+      this.tagNameDefined = true;
+      if (!this.analysisPath) {
+        this.analysisPath = `${el.importPath}analysis.json`;
+      }
     }
 
     notifyAnalysisError(code) {
@@ -109,8 +115,8 @@
       this._setFetchingAnalysis(false);
     }
 
-    _computeElementAnalysis(analysis, tagName) {
-      if (!analysis || !tagName) return;
+    _computeElementAnalysis(analysis, tagName, tagNameDefined) {
+      if (!analysis || !tagName || !tagNameDefined) return;
       return analysis.elements.find(element => element.tagname === tagName);
     }
   };
