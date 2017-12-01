@@ -1,84 +1,84 @@
 <script>
-(()=> {
-  'use strict';
+  (()=> {
+    'use strict';
 
-  if (!window.Zecat) window.Zecat = {};
-
-  /**
-   *
-   *
-   * @polymer
-   * @mixinFunction
-   */
-  Zecat.FetchAnalysis = superClass => class extends superClass {
+    if (!window.Zecat) window.Zecat = {};
 
     /**
-    * @event analysis-error Fired when the analysis file could no be parse or
-    *                       fetch.
-    */
+     *
+     *
+     * @polymer
+     * @mixinFunction
+     */
+    Zecat.FetchAnalysis = superClass => class extends superClass {
 
-    static get properties() {
-      return {
-        fetchingAnalysis: {
-          type: Boolean,
-          value: false,
-          readOnly: true,
-          notify: true
-        },
-        analysis: Object,
-        analysisPath: String,
-        analyzedElement: Object,
-        tagNameDefined: {
-          type: Boolean,
-          value: false
-        },
-        tagName: String,
-        elementAnalysis: {
-          type: Object,
-          computed: '_computeElementAnalysis(analysis, tagName, tagNameDefined)'
+      /**
+       * @event analysis-error Fired when the analysis file could no be parse or
+       *                       fetch.
+       */
+
+      static get properties() {
+        return {
+          fetchingAnalysis: {
+            type: Boolean,
+            value: false,
+            readOnly: true,
+            notify: true
+          },
+          analysis: Object,
+          analysisPath: String,
+          analyzedElement: Object,
+          tagNameDefined: {
+            type: Boolean,
+            value: false
+          },
+          tagName: String,
+          elementAnalysis: {
+            type: Object,
+            computed: '_computeElementAnalysis(analysis, tagName, tagNameDefined)'
+          }
+        };
+      }
+
+      static get observers() {
+        return [
+          '_updateAnalaysisFromPath(analysisPath)',
+          '_analyzedElementChanged(analyzedElement)'
+        ];
+      }
+
+      constructor() {
+        super();
+        this.analysisErrors = {
+          0: 'No element specified to retrieve analysis',
+          1: 'Can not fetch analysis file for a non element node',
+          2: 'analysis.json could not be found',
+          3: 'Analysis fetched a wrong status code',
+          4: 'No elements array find in analysis file',
+          5: 'No analysis configuration for the given tag name'
+        };
+      }
+
+      async _analyzedElementChanged(el) {
+        if (!el) return;
+
+        if (el.nodeType != Node.ELEMENT_NODE) {
+          this.notifyAnalysisError(1);
+          return;
         }
-      };
-    }
+        this.tagName = el.localName;
 
-    static get observers() {
-      return [
-        '_updateAnalaysisFromPath(analysisPath)',
-        '_analyzedElementChanged(analyzedElement)'
-      ];
-    }
 
-    constructor() {
-      super();
-      this.analysisErrors = {
-        0: 'No element specified to retrieve analysis',
-        1: 'Can not fetch analysis file for a non element node',
-        2: 'analysis.json could not be found',
-        3: 'Analysis fetched a wrong status code',
-        4: 'No elements array find in analysis file',
-        5: 'No analysis configuration for the given tag name'
-      };
-    }
-    
-    async _analyzedElementChanged(el) {
-      if (!el) return;
-
-      if (el.nodeType != Node.ELEMENT_NODE) {
-        this.notifyAnalysisError(1);
-        return;
+        // wait for the element to be defined in order to access its import path
+        await customElements.whenDefined(this.tagName);
+        this.tagNameDefined = true;
+        if (!this.analysisPath) {
+          this.analysisPath = `${el.importPath}analysis.json`;
+        }
       }
-      this.tagName = el.localName;
 
-
-      // wait for the element to be defined in order to access its import path
-      await customElements.whenDefined(this.tagName);
-      this.tagNameDefined = true;
-      if (!this.analysisPath) {
-        this.analysisPath = `${el.importPath}analysis.json`;
-      }
-    }
-
-    notifyAnalysisError(code) {
-      this.dispatchEvent(
+      notifyAnalysisError(code) {
+        this.dispatchEvent(
           new CustomEvent(
             'analysis-error',
             {
@@ -89,36 +89,36 @@
               bubbles: true,
               composed: true
             }));
-    }
-
-    async _updateAnalaysisFromPath(analysisPath) {
-      if (!analysisPath) return;
-
-      let fetchAnalysis;
-
-      this._setFetchingAnalysis(true);
-      try {
-        fetchAnalysis = await fetch(analysisPath);
-      } catch (err) {
-        this._setFetchingAnalysis(false);
-        this.notifyAnalysisError(2);
-        return;
       }
 
-      if (!fetchAnalysis.ok) {
-        this.notifyAnalysisError(3);
+      async _updateAnalaysisFromPath(analysisPath) {
+        if (!analysisPath) return;
+
+        let fetchAnalysis;
+
+        this._setFetchingAnalysis(true);
+        try {
+          fetchAnalysis = await fetch(analysisPath);
+        } catch (err) {
+          this._setFetchingAnalysis(false);
+          this.notifyAnalysisError(2);
+          return;
+        }
+
+        if (!fetchAnalysis.ok) {
+          this.notifyAnalysisError(3);
+          this._setFetchingAnalysis(false);
+          return;
+        }
+
+        this.analysis = await fetchAnalysis.json();
         this._setFetchingAnalysis(false);
-        return;
       }
 
-      this.analysis = await fetchAnalysis.json();
-      this._setFetchingAnalysis(false);
-    }
-
-    _computeElementAnalysis(analysis, tagName, tagNameDefined) {
-      if (!analysis || !tagName || !tagNameDefined) return;
-      return analysis.elements.find(element => element.tagname === tagName);
-    }
-  };
-})();
+      _computeElementAnalysis(analysis, tagName, tagNameDefined) {
+        if (!analysis || !tagName || !tagNameDefined) return;
+        return analysis.elements.find(element => element.tagname === tagName);
+      }
+    };
+  })();
 </script>

@@ -36,7 +36,7 @@
         font-size: 12px;
       }
     </style>
-    
+
     <div id="toolbar">
       <span>[[label]]</span><span id="type">[[type]]</span>
     </div>
@@ -53,8 +53,8 @@
 
   <script>
     /**
-     * 
-     * 
+     *
+     *
      * @customElement
      * @polymer
      * @apply Zecat.Sandboxer
@@ -100,7 +100,7 @@
       updateJsonFromObject(object) {
         // Update the value and position the cursor at the first line
         this.$.juicyAceEditor.editor.setValue(this._prettyStringify(object), 1);
-        this._prettyStringifiedValue = this.$.juicyAceEditor.value; 
+        this._prettyStringifiedValue = this.$.juicyAceEditor.value;
       }
 
       resetDefaultValue() {
@@ -131,7 +131,7 @@
       _handleEditorFocus() {
         this._setEditing(true);
       }
-     
+
       _handleEditorBlur() {
         this._setEditing(false);
         // if json has changed and is valid
