@@ -88,7 +88,13 @@
       }
 
       _prettyStringify(object) {
-        return object == undefined ? '' : JSON.stringify(object, null, 2);
+        if (object == undefined) return '';
+        try {
+          return JSON.stringify(object, null, 2);
+        } catch(error) {
+          // TODO strignify HTMLElement may fail with "TypeError: Converting circular structure to JSON"
+          return '';
+        }
       }
 
       updateJsonFromObject(object) {
