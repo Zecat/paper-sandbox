@@ -40,7 +40,7 @@
     </style>
 
     <paper-toast id="errorToast"></paper-toast>
-    
+
     <template is="dom-if" if="[[_narrow]]">
       <paper-fab
         icon="[[_computeFabIcon(_drawerOpened)]]"
@@ -112,7 +112,20 @@
       }
 
       _slotChangeHandler() {
-        this.$.sandbox.analyzedElement = this.querySelector(this.tag);
+        let element;
+
+        if (!this.tag) {
+	  const assignedNodes = this.$.slot.assignedNodes();
+	  element = assignedNodes.find(this._isCustomElement);
+        } else {
+          element = this.querySelector(this.tag)
+        }
+        this.$.sandbox.analyzedElement = element;
+      }
+
+      _isCustomElement(node) {
+        const localName = node && node.localName;
+        return !!(localName && customElements.get(localName));
       }
 
       toggleDrawer() {
