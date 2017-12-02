@@ -247,8 +247,14 @@
          */
         const observer = new MutationObserver(shadowNodeMutationsHandler);
 
+        /**
+         * @type {boolean}
+         * Whether or not the shadow dom is native or a polyfill.
+         */
+        const native = this.shadowRoot.mode != undefined;
+
         // Activate the observer which processes added sections nodes.
-        observer.observe(this.shadowRoot, {childList: true});
+        observer.observe(native ? this.shadowRoot : this, {childList: true});
       }
 
       /**
