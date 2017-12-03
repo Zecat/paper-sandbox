@@ -60,7 +60,8 @@
         horizontal-offset="12"
         allow-outside-scroll
         horizontal-align="right"
-        ignore-select>
+        ignore-select
+        on-tap="_closeOnOusideTap">
       <paper-icon-button
           icon="filter-list"
           slot="dropdown-trigger"
@@ -124,6 +125,16 @@
 
       _stopPropagation(e) {
         e.stopPropagation();
+      }
+
+      /**
+       * Hack to close the overlay when user taps the iron-dropdown element
+       */
+      _closeOnOusideTap(e) {
+        const rootTarget = e.composedPath()[0];
+        if (rootTarget.is === 'iron-dropdown') {
+          this.$.moreBtn.close();
+        }
       }
 
       _computeExpandIcon(expanded) {
