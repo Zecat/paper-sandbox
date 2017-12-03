@@ -15,7 +15,7 @@
    * @appliesMixin Zecat.FetchAnalysis
    */
   Zecat.Sandbox = (superClass) => class extends Zecat.FetchAnalysis(superClass) {
-    
+
     static get properties() {
       return {
         /**
@@ -59,9 +59,9 @@
 
     __updateElementStyles(cr, element) {
       if (cr === undefined || element === undefined) return;
-      
+
       const nameSubpath = cr.path.indexOf('.value');
-      
+
       if (nameSubpath >= 0) {
         const itempath = cr.path.substring(0, nameSubpath);
         const item = this.get(itempath);
@@ -84,7 +84,7 @@
       if (!elementAnalysis) return;
 
       let groups = [];
-      
+
       for (let groupName of this._propertyGroupNames) {
         groups.push({
           name: groupName,
@@ -118,7 +118,7 @@
         title: 'Events',
         items: elementAnalysis.events
       });
-      
+
       this.elementEntities = groups;
     }
 
@@ -136,11 +136,11 @@
         `elementEntities.${groupIndex}.items.${groupPropertyIndex}`);
 
       this._setElementAnalysisProperty(analysisPropertyIndex, this.analyzedElement[property.name]);
-      
+
       const polymerMetadata = property.metadata.polymer;
-      
+
       if (!polymerMetadata || !polymerMetadata.notify) return;
-      
+
       const callback = e => {
         this._setElementAnalysisProperty(analysisPropertyIndex, e.detail.value);
       };
@@ -159,7 +159,7 @@
           !(elementEntities instanceof Array) ||
           !(cssVariables instanceof Array) ||
           !cssVariables.length) return;
-          
+
       // The observer is sometime call twice, this is a hack for not adding css variables a second time
       if (elementEntities.find(group => group.name === 'cssVariable')) return;
 

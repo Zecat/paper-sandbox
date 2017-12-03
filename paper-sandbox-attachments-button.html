@@ -36,7 +36,7 @@
   <script>
     /**
      * Missing Description
-     * 
+     *
      * @customElement
      * @polymer
      */
@@ -53,13 +53,13 @@
           }
         };
       }
-      
+
       _handleAttachmentSelection(event) {
         const item = event.detail.item;
         const model = this.$.attachmentsRepeater.modelForElement(item);
         const attachment = model.item;
         const attachmentItems = attachment.items;
-        
+
         if (!(attachmentItems instanceof Array)) return;
 
         for (let {name: attachmentItemName, value: attachmentItemValue} of attachmentItems) {
