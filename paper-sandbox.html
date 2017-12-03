@@ -2,7 +2,6 @@
 <link rel="import" href="../polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../paper-input/paper-input.html">
 <link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
-<link rel="import" href="../paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../paper-number-input/paper-number-input.html">
 <link rel="import" href="../paper-styles/typography.html">
@@ -13,6 +12,7 @@
 <link rel="import" href="paper-sandbox-object.html">
 <link rel="import" href="paper-sandbox-css-variable.html">
 <link rel="import" href="paper-sandbox-attachments-button.html">
+<link rel="import" href="paper-sandbox-inheritance-menu-button.html">
 
 <dom-module id="paper-sandbox">
   <template strip-whitespace>
@@ -20,6 +20,7 @@
       :host {
         display: block;
         position: relative;
+	@apply --paper-font-common-base;
       }
       .section {
         @apply --layout-vertical;
@@ -75,14 +76,6 @@
         margin: 16px;
         z-index: 0;
       }
-      #moreBtn {
-        display: block;
-        position: sticky;
-        top: 12px;
-        margin-left: calc(100% - 50px);
-        z-index: 2;
-        margin-top: -40px;
-      }
       .list {
         padding: 24px 74px 42px 24px;
         display: grid;
@@ -95,9 +88,21 @@
       .cssVariable > .list {
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       }
+      #moreButton {
+        display: block;
+        position: sticky;
+        top: 0;
+        margin-left: calc(100% - 56px);
+        z-index: 2;
+        margin-top: -56px;
+      }
     </style>
 
-    <paper-icon-button id="moreBtn" icon="more-vert"></paper-icon-button>
+    <paper-sandbox-inheritance-menu-button
+        id="moreButton"
+        horizontal-align="right"
+        filters="{{filters}}">
+    </paper-sandbox-inheritance-menu-button>
 
     <template is="dom-repeat" id="sectionsDomRepeat"
         items="{{elementEntities}}"
@@ -327,12 +332,12 @@
       _computeFilters(elementEntities, initialDisplayedInheritance) {
         if (!(elementEntities instanceof Array) ||
             !(initialDisplayedInheritance instanceof Array)) return;
-            
+
         let filters = [];
-        
+
         const findFilterForInheritance = inheritedFrom =>
           filters.find(filter => filter.inheritedFrom === inheritedFrom);
-        
+
         for (let {items: entityItems} of elementEntities) {
           for (let {inheritedFrom = this.constructor.notInheritedLabel} of entityItems) {
             if (findFilterForInheritance(inheritedFrom)) continue;
@@ -348,6 +353,8 @@
             filters.push(value);
           }
         }
+
+        return filters.sort((filterA, filterB) => filterA.inheritedFrom > filterB.inheritedFrom);
 
         return filters;
       }

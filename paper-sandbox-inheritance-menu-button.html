@@ -1,0 +1,153 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../iron-flex-layout/iron-flex-layout.html">
+<link rel="import" href="../paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../iron-icon/iron-icon.html">
+<link rel="import" href="../paper-styles/color.html">
+<link rel="import" href="../app-menu/app-menu.html">
+<link rel="import" href="../app-menu/app-submenu.html">
+
+<dom-module id="paper-sandbox-inheritance-menu-button">
+  <template>
+
+    <style>
+      paper-menu-button {
+        --paper-menu-button-dropdown: {
+ 	  min-height: 100vh;
+        }
+      }
+
+      paper-checkbox {
+        --paper-checkbox-label-spacing: 12px;
+      }
+
+      app-menu > paper-checkbox,
+      app-menu div {
+        height: 42px;
+        padding: 0 12px;
+        @apply --layout-horizontal;
+        @apply --layout-center;
+      }
+
+      app-menu div {
+        cursor: pointer;
+      }
+
+      .expand-icon {
+        margin-left: 64px;
+        @apply --layout-end;
+      }
+
+      app-menu span {
+        @apply --layout-flex;
+      }
+
+      app-submenu.divider {
+        border-bottom: 1px solid var(--paper-grey-300);
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+      }
+
+      app-submenu app-menu {
+        margin-left: 27px;
+      }
+
+    </style>
+
+    <paper-menu-button id="moreBtn"
+        vertical-offset="12"
+        horizontal-offset="12"
+        allow-outside-scroll
+        horizontal-align="right"
+        ignore-select>
+      <paper-icon-button
+          icon="filter-list"
+          slot="dropdown-trigger"
+          alt="menu">
+      </paper-icon-button>
+      <app-menu slot="dropdown-content">
+        <template is="dom-repeat" items="{{filters}}">
+          <app-submenu opened="{{item.expanded}}" class$="[[_getInheritanceClass(index)]]">
+            <div slot="submenu-trigger">
+              <paper-checkbox
+                  checked="{{item.selected}}"
+                  on-tap="_stopPropagation">
+              </paper-checkbox>
+              <span>[[item.inheritedFrom]]</span>
+              <iron-icon class="expand-icon"
+                  icon="[[_computeExpandIcon(item.expanded)]]">
+              </iron-icon>
+            </div>
+            <app-menu slot="submenu-content">
+              <paper-checkbox
+                  aria-hidden="true"
+                  checked="{{item.public}}">
+                Public
+              </paper-checkbox>
+              <paper-checkbox
+                  aria-hidden="true"
+                  checked="{{item.private}}">
+                Private
+              </paper-checkbox>
+              <paper-checkbox
+                  aria-hidden="true"
+                  checked="{{item.protected}}">
+                Protected
+              </paper-checkbox>
+            </app-menu>
+          </app-submenu>
+        </template>
+      </app-menu>
+    </paper-menu-button>
+
+  </template>
+
+  <script>
+    /**
+     *
+     * @customElement
+     * @polymer
+     */
+    class PaperSandboxInheritanceMenuButton extends Polymer.Element {
+
+      static get is() { return 'paper-sandbox-inheritance-menu-button'; }
+
+      static get properties() {
+        return {
+          filters: {
+            type: Array,
+            notify: true
+          }
+        };
+      }
+
+      _stopPropagation(e) {
+        e.stopPropagation();
+      }
+
+      _computeExpandIcon(expanded) {
+        return expanded ? 'expand-less' : 'expand-more';
+      }
+
+      _getFilterNamespace(filter) {
+        return filter.inheritedFrom.split('.')[0];
+      }
+
+      _getInheritanceClass(index) {
+        const filter = this.filters[index];
+        const nextFilter = this.filters[index +1];
+
+        if (!nextFilter) return;
+
+        const prefix = this._getFilterNamespace(filter);
+        const nextPrefix = this._getFilterNamespace(nextFilter);
+
+        if (prefix !== nextPrefix) return 'divider';
+      }
+    }
+
+    window.customElements.define(PaperSandboxInheritanceMenuButton.is, PaperSandboxInheritanceMenuButton);
+
+  </script>
+</dom-module>
